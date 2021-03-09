@@ -1,0 +1,6 @@
+[submodule "external/@TIFFStack"]
+	path = external/@TIFFStack
+	url = https://github.com/GliaLab/TIFFStack
+[submodule "external/NoRMCorre"]
+	path = external/NoRMCorre
+	url = https://github.com/flatironinstitute/NoRMCorre
