@@ -1,0 +1,13 @@
+function metadata = read_metadata(path)
+%% Load from metadata file if it exists.
+metadata_file = fullfile(path,'metadata.mat');
+assert(exist(metadata_file,'file') == 2, ...
+    'begonia:load:missing_metadata', ...
+    'No metadata.mat file found');
+
+load(metadata_file);
+assert(exist('metadata','var') == 1, ...
+    'begonia:load:wrong_metadata', ...
+    'metadata file found, but did not contain a metadata variable.');
+end
+
