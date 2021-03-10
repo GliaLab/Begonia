@@ -25,8 +25,8 @@ end
 roa_param_hidden = ts.load_var('roa_param_hidden',[]);
 
 for channel = 1:ts.channels
-    if roa_param(channel).roa_enabled
-        ts.clear_var("roa_mask_ch"+channel);
+    if channel <= length(roa_param) && roa_param(channel).roa_enabled
+        ts.clear_var("roa_mask_ch" + channel);
     else
         continue;
     end
