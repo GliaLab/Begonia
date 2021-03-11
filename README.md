@@ -11,39 +11,41 @@ The system offers some graphical workflow for non-programmers, and a API for pro
 It is possible for non-programmers to use the framwork initially for overview of data and autmatic anaysis for project piloting or quick reviews of data as it is collected.
 
 
-# ⚠️ Known issues ⚠️
+# Known issues ⚠️
 
 Please be aware of the following when using the RoI Manager ("roiman"):
 
-* A Matlab bug prevents roimanager getting keyboard event if timeseries view is raised by clicking inside the window. Workaround: click the titlebar of a window before clicking inside it to draw RoIs etc.
-* Due to and incoherence in Matlab's App Designer's behaviour, Mac users using RoIMan need to command-click to activate buttons in windows that are not topmost. Clicks without the command button raises window.
+* A bug prevents roimanager getting keyboard event if timeseries view is raised by clicking inside the window. Workaround: click the titlebar of a window before clicking inside it to draw RoIs etc.
+* Due to and incoherence in Matlab's App Designer's behaviour, Mac users using the RoI manager need to command-click to activate buttons in windows that are not topmost. Clicks without the command button raises windows, but events do not register inside them.
 * Due to limitations in Matlab's App Designer, controls that have focus blocks keyboard shortcuts. This means you may not be able to use keyboard shortcuts after making selections in drop-down menus unless you click the editor or tool window first.
 
 # Paper 
 
 TBA / TBD
 
-# Graphical workflow for non-programmers
+# Videos and GUI hints
 
-We refer to the following YouTube videos:
+We refer to [our YouTube playlist](https://www.youtube.com/playlist?list=PLp3p4GiuHqnL8w1SXF-6g0CsLld0nl3zg) that demonstrates the main workflow of begonia from start to finish.
 
-Opening imaging data
+Specific videos:
+* [Workflow overview](https://youtu.be/mzcugrLk4rk)
+* [Installation](https://youtu.be/De_7MfuIO1E)
+* [Import, sessions, motion correction, batch operations](https://youtu.be/QuaAMHsj28g)
+* [Dataman filtering](https://youtu.be/riIy2mJ_gqQ)
+* [Dataman "data" menu, Matlab command window interoperability](https://youtu.be/3X8d8_k-j-U)
+* [DataLocation (metadata) overview and API](https://youtu.be/aEwbBqXdIhY)
+* Regions-of-interest (RoIs): 
+    * [Marking](https://youtu.be/2501a9V6ap8)
+    * [processing 1](https://youtu.be/0ScSfpPVu1s)
+    * [processing 2](https://youtu.be/FSoLAL-Io6M)
+* RoAs (activity detection): 
+    * [Part 1 - SNR optimization](https://youtu.be/tjhT51NWOj0)
+    * [Part 2 - Baseline treshold](https://youtu.be/dVeicKcn_rM)
+    * [Part 3 - Result inspection, processing with RoIs](https://youtu.be/P0BMCA14ErA)
+    * [Part 4 - Plotting, CSV export](https://youtu.be/I9_H8V7H1Wc)
 
-Motion correcting data / conversion to H5 data format
 
-Adding and displaying metadata 
-
-Off-path vs. on-path storage engines - how to set?
-
-Marking RoIs
-
-Automatic RoA analysis with default parameter detection
-
-Customizing RoA analysis parameters and tresholds
-
-Processing RoI and RoA signals
-
-Reviewing, accessing and exporting results
+Cheatsheet to navigate the RoI manager:
 
 ![QA plot for RoIs](docs/cheat_sheet.png)
 
