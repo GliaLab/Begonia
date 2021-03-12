@@ -426,8 +426,51 @@ Also note that sources can add custom columns to a MultiTable. In this example `
 
 ![Categorical array for global segmentation](docs/screenshots/mtab_output.png)
 
+## Time alignment
+
+Traces can be aligned in time based on the absolute start time, so that frames in the traces correlate as much as possible. Performing time alignment means all traces returned have the same start time. 
+
+Missing data at the start of aligned traces will be padded with nans, or trimmed if the trace starts before the alignment point.
+
+Note: performing time alignment on already segmented data can have unexpcted consequences. 
+
+```matlab
+import begonia.data_management.multitable.MultiTable;
+import begonia.data_management.multitable.add_memory;
+import begonia.data_management.multitable.timealign;
+
+% make some dummy data:
+fps = 30;
+trace_1 = zeros(1, fps * 10);
+trace_2 = zeros(1, fps * 12);
+trace_3 = repmat(categorical("no-signal 😢"), 1, fps * 9);
+
+trace_1(fps*1) = 42;
+trace_2(fps*2) = 42;
+trace_3(fps*3) = categorical("signal 🎉");
+
+time_1 = datetime();
+time_2 = datetime() - seconds(1);
+time_3 = datetime() - seconds(2);
+
+% add to a multitable:
+dt = 1/fps;
+
+mtab = MultiTable();
+
+add_memory(mtab, "A", "trace 1", trace_1, dt, time_1);
+add_memory(mtab, "A", "trace 2", trace_2, dt, time_2);
+add_memory(mtab, "A", "trace 3", trace_3, dt, time_3)
+
+% perform time alignment:
+traces = mtab.by_entity("A");
+traces_aligned = timealign(traces, "first");
+```
+
+![Time alignment by first and last](docs/screenshots/timealign.png)
+
 ## Resampling
-Traces retrieved by by_cat and by_entity_cat contain time information and can be resampled by provoding a new delta time.
+Traces retrieved by by_cat and by_entity_cat contain time information and can be resampled by provoding a new delta time. Performing resampling means all traces returned have the same delta time. 
 
 ```matlab
 import begonia.data_management.multitable.resample;
