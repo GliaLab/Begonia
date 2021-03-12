@@ -1,4 +1,4 @@
-# Neobegonia
+# Begonia
 
 **Begonia is a Matlab framework developed by [Glialab](https://www.med.uio.no/imb/english/research/groups/glial-cells/). that helps solve some core challenges of scientific image analysis of 2-photon imaging data of astrocytes.** 
 
