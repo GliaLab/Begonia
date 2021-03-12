@@ -45,7 +45,7 @@ classdef DataLocationSource < begonia.data_management.multitable.Source
             % generate result row:
             trace = {trace};
             seg_category = "*";
-            seg_start_abs = obj.dloc.start_time_abs;
+            seg_start_abs = obj.dloc.start_time;
             seg_start_f = 1;
             seg_end_f = length(trace{:});
             trace_dt = dt; %#ok<*PROPLC>
