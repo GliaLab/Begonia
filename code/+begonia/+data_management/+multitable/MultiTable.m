@@ -45,12 +45,27 @@ classdef MultiTable < handle
             end
         end
         
-        function save(obj); end
+        function tab = get_empty_result_table(obj)
+            
+            entity = string.empty;
+            category = string.empty;
+            trace =  cell.empty;  %#ok<*PROPLC>
+            trace_dt = [];
+            
+            seg_category = string.empty;
+            seg_start_abs = datetime.empty;
+            seg_start_f = [];
+            seg_end_f = [];
+            transition_f = [];
 
-        
-        
-        function remove(entity, catname); end
-        
+            tab = table(entity, category, trace, trace_dt, ...
+                seg_category, seg_start_abs, seg_start_f, seg_end_f, ...
+                transition_f);
+            
+            % final step: append extra columns:
+            extras = obj.get_extra_columns(0);
+            tab = horzcat(tab, extras);
+        end
         
         function result = process_rows(rows)
             import begonia.util.to_loopable;
