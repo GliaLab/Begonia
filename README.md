@@ -50,7 +50,13 @@ Cheatsheet to navigate the RoI manager:
 ![QA plot for RoIs](docs/cheat_sheet.png)
 
 # Quick start (for programmers)
+The repository must be initialized with submodules to function correctly. The current submodules that Begonia depends on are the motion correction software, 
+NoRMCorre, and a modified version of the TIFF reading library, TIFFStack. The submodules are located under `Begonia/external`. 
 
+Submodules can be initialized with:
+```
+# git submodule update --init --recursive
+```
 
 
 # Metadata
