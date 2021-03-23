@@ -548,6 +548,22 @@ traces = mtab.by_cat(["movement-state", "drift", "speed", "whisk", "ca-active-fr
 segs = segment_entity(traces, "movement-state", ["state.run"]);
 ```
 
+## Merge segments from category
+After segmentation, individual categories can be re-merged into single traces. The function only works if the input traces provide one unique segment pr. time pr. category. E.g., if two segments in the same category start at the same sample point, an error will arise.
+
+Output will be *one row pr. entity* with all segments merged into one trace. Note that only duration property is valid after this processing, and that start and end columns will be set to missing.
+
+```matlab
+import begonia.data_management.multitable.segment_entity;
+
+% get some segments:
+segs = segment_entity(traces, "movement-state", ["state.run"]);
+
+% if segments contains multiple entries pr. timepoint, such as multiple calcium compartments, they need to be filtered:
+comp_segs = segs(segs.ca_compartment == "Gp", :);
+merged = merge_cat_segments(comp_segs);
+```
+
 ## Timerange
 
 In this example we'll use timerange to extract a specific time range from all traces. Int his case we'll get the range that covers the airpuff, with 10 seconds baseline before. 
