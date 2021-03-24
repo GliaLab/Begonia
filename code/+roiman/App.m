@@ -7,8 +7,12 @@ classdef App < handle
     end
     
     properties
-        PREFS_KEY = ".glialab_roiman_prefs.mat";
-        VIEW_OFFSET_MAX = 5;    % number of views pr. row anc column
+        % update this key to avoid collisions between versions of the
+        % preferences file:
+        PREFS_KEY = ".glialab_roiman_prefs_v1.1.1.mat";
+        
+        % number of views pr. row anc column
+        VIEW_OFFSET_MAX = 5;    
         
         view_managers
         tools
