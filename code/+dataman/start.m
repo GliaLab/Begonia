@@ -1,11 +1,15 @@
-function editor = start(dlocs)  
+function editor = start(dlocs, custom_actions)  
     import xylobium.dledit.mods.HasVarMod;
-
+    
+    if nargin < 2
+        custom_actions = [];
+    end
     if nargin < 1
         dlocs = begonia.data_management.DataLocation.empty;
     end
 
     actions = dataman.actions.build_menus_and_buttons();
+    actions = [custom_actions actions];
     vars = ["name", "!tags", "path", "type", "source", "stabilized", ...
         "roi_table", "roi_status", "roa_status", "roa_template", "roa_mask", ...
         "roi_signals_dff", "roi_signals_rpa", ...
