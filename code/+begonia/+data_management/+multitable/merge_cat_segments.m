@@ -19,7 +19,7 @@ function tab = merge_cat_segments(segs)
             % compose merged result:
             row = cat_rows(1,:);
             row.trace = {vertcat(cat_rows.trace{:})};
-            row.duration_s = sum(cat_rows.duration_s);
+            %row.duration_s = sum(cat_rows.duration_s);
             row.seg_end_f = missing;
             row.seg_start_f = missing;
             row.seg_start_abs = missing;
