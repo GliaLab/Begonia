@@ -19,8 +19,9 @@ function roi_table = make_roi_table()
     roiarray_source = cell.empty;
     version = string.empty;
     added = datetime.empty;
+    metadata = struct.empty;
     
     roi_table = table(short_name, roi_id, source_id, channel, z_idx, shape, type, parent_id, ...
-        area_px2, center_x, center_y, center_z, translations, mask, roiarray_source, version, tags, added);
+        area_px2, center_x, center_y, center_z, translations, mask, roiarray_source, version, tags, added, metadata);
 end
 

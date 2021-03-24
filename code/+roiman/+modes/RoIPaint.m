@@ -236,13 +236,14 @@ classdef RoIPaint < roiman.Mode
             z_idx = 1;
             roiarray_source = struct();
             added = datetime();
+            metadata = struct();
             
             if isempty(parent_id)
                 parent_id = " ";
             end
                 
             roi = table(short_name, area_px2, center_x, center_y, center_z, translations, channel, mask, parent_id, roi_id,...
-                shape, source_id, tags, type, version, z_idx, roiarray_source, added);
+                shape, source_id, tags, type, version, z_idx, roiarray_source, added, metadata);
             
             % install in memento:
             tab_orig = tab;

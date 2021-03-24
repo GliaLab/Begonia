@@ -27,6 +27,7 @@ function roi_table = convert_legacy_roiarray(roi_array, ts_name)
         roi_table.version(i) = "1.0";
         roi_table.z_idx(i) = 1; % legacy had no depth concept, so we are at 1
         roi_table.added(i) = datetime();
+        roi_table.metadata(i) = struct();
         
         if ~isempty(roi.id_connected_roi)
             roi_table.parent_id(i) = string(roi.id_connected_roi);

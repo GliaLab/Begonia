@@ -26,7 +26,9 @@ function init_roi_editing(manager)
     else
         roi_table = make_roi_table(); % fresh beginnings (:
     end
-        
+    
+    % ensure up-to-date
+    roi_table = begonia.processing.roi.update_roi_table(roi_table); 
     m_write("roi_table", roi_table);
 end
 
