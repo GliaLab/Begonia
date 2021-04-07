@@ -1,6 +1,5 @@
 function metadata = read_metadata(path)
-% Load a certain data from the metadata from the tif file and
-% returns a struct of that data. 
+% Load metadata from the tif file and return a struct. 
 
 metadata = struct;
 metadata.name               = [];
@@ -17,6 +16,8 @@ metadata.zoom               = [];
 metadata.start_time         = [];
 metadata.duration           = [];
 metadata.source             = [];
+metadata.tiff_source        = [];
+metadata.frame_position_um  = [];
 
 warning off
 tif = Tiff(path);
@@ -25,29 +26,34 @@ warning on
 [~,filename,ext] = fileparts(path);
 metadata.name = [filename,ext];
 
-% Try to read metadata from known formats.
+% Try to guess the format based on some hints in the metadata.
 format = '';
 try
     str = tif.getTag('Software');
-    if isequal(str(1:2),'SI')
+    if strcmp(str(1:2),'SI')
+        % Scan image starts its metdata with SI.
         format = 'ScanImage';
-    elseif isequal(str(1),'{')
+    elseif strcmp(str(1),'{')
+        % In begonia's format the metadata is encoded with json that starts
+        % with a squiggly bracket. 
         format = 'Begonia';
     end
 end
-
 if isempty(format)
     try
         str = tif.getTag('ImageDescription');
-        if isequal(str(1:7),'ImageJ=')
+        if strcmp(str(1:7),'ImageJ=')
             format = 'ImageJ';
+        elseif strcmp(str(1:8),'Creator:')
+            format = 'Sutter';
         end
     end
 end
 
+metadata.tiff_source = format;
+
 switch format
     case 'ScanImage'
-        
         evalc(tif.getTag('ImageDescription'));
         evalc(tif.getTag('Software'));
 
@@ -70,18 +76,21 @@ switch format
         metadata.dx = width_um / metadata.img_dim(2);
         metadata.dy = height_um / metadata.img_dim(1);
         
-        % Find the last frame by searching for the last frame that can be
-        % read.
+        % The number of frames is included in the metadata from scanimage,
+        % but if the recording was interrupted early the number of frames
+        % is not correct. Here the real number of frames is found by
+        % searching for the last frame that can be read using the interval
+        % halving method. 
         total_dirs = metadata.frame_count * metadata.channels;
-        
         warning off
+        % Load the tiffstack using the modified TIFFStack library. This
+        % allows to load the tiff without reading all the header
+        % information and speeds up loading. 
         mat = TIFFStack(path,[],metadata.channels,true,total_dirs);
         warning on
-        
         frame_low = 1;
         frame_high = metadata.frame_count;
         frame_current = frame_high;
-        
         while frame_high - frame_low > 1
             try
                 img = mat(:,:,metadata.channels,frame_current);
@@ -92,20 +101,23 @@ switch format
             
             frame_current = frame_low + floor((frame_high - frame_low)/2);
         end
-        
         metadata.frame_count = frame_current;
+        
     case 'Begonia'
+        % In the "Begonia" format all the metadata is written to the
+        % Software tag with json encoding. 
         tmp = jsondecode(tif.getTag('Software'));
         % Assign properties from the struct 'tmp' to the metadata struct.
         f = fieldnames(tmp);
         for i = 1:length(f)
             metadata.(f{i}) = tmp.(f{i});
         end
-        
+        % Change the format of the start time. 
         if ~isempty(metadata.start_time)
             metadata.start_time = datetime(metadata.start_time,'InputFormat','uuuu/MM/dd HH:mm:ss');
         end
         metadata.duration = seconds(metadata.duration);
+        
     case 'ImageJ'
         str = tif.getTag('ImageDescription');
         
@@ -127,7 +139,10 @@ switch format
         
         % Find channels. 
         channels = regexp(str,'(?<=channels=).*?(?=\n)','match');
-        if ~isempty(channels)
+        if isempty(channels)
+            metadata.channels = 1;
+            metadata.channel_names = {'Channel 1'};
+        else
             metadata.channels = str2double(channels{1});
             channel_names = {};
             for ch = 1:metadata.channels
@@ -137,49 +152,106 @@ switch format
         end
         
         % Find dt
-        finterval = regexp(str,'(?<=finterval=).*?(?=\n)','match');
+        dt = regexp(str,'(?<=finterval=).*?(?=\n)','match');
         fps = regexp(str,'(?<=fps=).*?(?=\n)','match');
-        if ~isempty(finterval)
-            metadata.dt = str2double(finterval{1});
+        if ~isempty(dt)
+            metadata.dt = str2double(dt{1});
         elseif ~isempty(fps)
             metadata.dt = 1/str2double(fps{1});
         end
-end
-
-% Check x and y resolution if missing. 
-if isempty(metadata.dx) || isempty(metadata.dy)
-    try
-        metadata.dx = 1/tif.getTag('XResolution');
-        metadata.dy = 1/tif.getTag('YResolution');
-    end
-end
-
-% Check the dimensions by opening the file. 
-if isempty(metadata.frame_count)
-    % Use TIFFStack to check all dimensions. 
-    mat = TIFFStack(path);
-    dim = size(mat);
-    metadata.img_dim = dim(1:2);
-    metadata.frame_count = dim(3);
-elseif isempty(metadata.img_dim)
-    metadata.img_dim = size(tif.read());
-end
-
-if ~isempty(metadata.dt)
-    metadata.duration = seconds(metadata.dt * metadata.frame_count);
-end
-
-if isempty(metadata.cycles)
-    metadata.cycles = 1;
-end
-
-if isempty(metadata.channels)
-    metadata.channels = 1;
-    metadata.channel_names = {'Channel 1'};
-end
-
-if isempty(metadata.source)
-    metadata.source = 'Unknown';
+        
+        try
+            metadata.dx = 1/tif.getTag('XResolution');
+            metadata.dy = 1/tif.getTag('YResolution');
+        end
+        
+        if ~isempty(metadata.dt)
+            metadata.duration = seconds(metadata.dt * metadata.frame_count);
+        end
+        
+        metadata.cycles = 1;
+        metadata.source = 'Unknown';
+        
+    case 'Sutter'
+        str = tif.getTag('ImageDescription');
+        
+        % Find the number of channels. 
+        metadata.channels = length(strfind(str,': Saved'));      
+        metadata.channel_names = {};
+        for i = 1:metadata.channels
+            expression = sprintf('(?<=Channel %d Name: ).*?(?=\n)',i);
+            channel_name = regexp(str,expression,'match');
+            channel_name = channel_name{1};
+            channel_name = channel_name(1:end-1);
+            metadata.channel_names{i} = channel_name;
+        end
+        
+        
+        dt = regexp(str,'(?<=Frame Duration: ).*?(?= s)','match');
+        dt = dt{1};
+        metadata.dt = str2double(dt);
+        
+        % Find the number between "Microns per pixel: " and "m". The greek
+        % mu symbol for micrometer is included in the string and is removed
+        % before converting the string to a double. 
+        dx = regexp(str,'(?<=Microns per pixel: ).*?(?=m)','match');
+        dx = dx{1};
+        % Remove the greek symbol, mu, from the end of the string. 
+        dx = dx(1:end-1);
+        metadata.dx = str2double(dx);
+        metadata.dy = metadata.dx;
+        
+        % Find the microscope position.
+        tmp = regexp(str,'(?<=X Stage position: ).*?(?=m)','match');
+        tmp = tmp{1};
+        % Remove the greek symbol, mu, from the end of the string. 
+        tmp = tmp(1:end-1);
+        xpos = str2double(tmp);
+        
+        tmp = regexp(str,'(?<=Y Stage position: ).*?(?=m)','match');
+        tmp = tmp{1};
+        % Remove the greek symbol, mu, from the end of the string. 
+        tmp = tmp(1:end-1);
+        ypos = str2double(tmp);
+        
+        tmp = regexp(str,'(?<=Z Stage position: ).*?(?=m)','match');
+        tmp = tmp{1};
+        % Remove the greek symbol, mu, from the end of the string. 
+        tmp = tmp(1:end-1);
+        zpos = str2double(tmp);
+        
+        metadata.frame_position_um = [xpos,ypos,zpos];
+        
+        tmp = regexp(str,'(?<=Magnification: ).*?(?=x)','match');
+        tmp = tmp{1};
+        tmp = tmp(1:end-1);
+        metadata.zoom = str2double(tmp);
+        
+        metadata.cycles = 1;
+        metadata.source = 'Sutter';
+        
+        info = imfinfo(path);
+        metadata.frame_count = length(info) / metadata.channels;
+        metadata.img_dim = size(tif.read());
+        
+        metadata.duration = seconds(metadata.dt * metadata.frame_count);
+        
+    otherwise
+        % Use TIFFStack to check all dimensions. 
+        mat = TIFFStack(path);
+        dim = size(mat);
+        metadata.img_dim = dim(1:2);
+        metadata.frame_count = dim(3);
+        
+        try
+            metadata.dx = 1/tif.getTag('XResolution');
+            metadata.dy = 1/tif.getTag('YResolution');
+        end
+        
+        metadata.cycles = 1;
+        metadata.channels = 1;
+        metadata.channel_names = {'Channel 1'};
+        metadata.source = 'Unknown';
 end
 
 metadata.img_dim = reshape(metadata.img_dim,1,[]);

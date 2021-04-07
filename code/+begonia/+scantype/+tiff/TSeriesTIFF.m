@@ -23,6 +23,8 @@ classdef TSeriesTIFF < begonia.scantype.TSeries & ...
         
         zoom
         frame_position_um
+        
+        tiff_source
     end
     
     methods
@@ -56,6 +58,8 @@ classdef TSeriesTIFF < begonia.scantype.TSeries & ...
             self.frame_count        = metadata.frame_count;
             self.name               = metadata.name;
             self.source             = metadata.source;
+            self.frame_position_um  = metadata.frame_position_um;
+            self.tiff_source        = metadata.tiff_source;
             
             if ~isempty(self.start_time_abs)
                 self.start_time_abs.Format = 'uuuu/MM/dd HH:mm:ss';
@@ -69,18 +73,38 @@ classdef TSeriesTIFF < begonia.scantype.TSeries & ...
         end
         
         function mat = get_mat(self,channel,cycle)
-            warning off
-            total_dirs = self.channels * self.frame_count;
-            mat = TIFFStack(self.path,[],self.channels,true,total_dirs);
-            mat.vnReducedDimensions = [0,0,channel,0,0];
-            warning on
-        end
-        
-        function mat = get_whole_mat(self)
-            warning off
-            total_dirs = self.channels * self.frame_count;
-            mat = TIFFStack(self.path,[],self.channels,true,total_dirs);
-            warning on
+            if strcmp(self.tiff_source,'Sutter')
+                % Sutter tiffs cannot be read by the lazy TIFFStack.
+                tif = Tiff(self.path);
+                mat = zeros([self.img_dim,self.frame_count],'uint16');
+                
+                % Read the first frame.
+                for ch = 1:channel-1
+                    tif.nextDirectory();
+                end
+                mat(:,:,1) = tif.read();
+                
+                % Read the rest.
+                for i = 2:size(mat,3)
+                    for ch = 1:self.channels
+                        tif.nextDirectory();
+                    end
+                    mat(:,:,i) = tif.read();
+                end
+            else
+                warning off
+                total_dirs = self.channels * self.frame_count;
+                % Use the modified version of the TIFFStack library to
+                % input how many frames is contained in the tiff to avoid
+                % reading unecessary header information. 
+                mat = TIFFStack(self.path,[],self.channels,true,total_dirs);
+                % Another modification to the TIFFStack library which
+                % allows reducing the number of dimensions. Here we put
+                % which channel should be fixed. This can change
+                % dimensions from 4D (x,y,channel,frames) to 3D (x,y,frames).
+                mat.vnReducedDimensions = [0,0,channel,0,0];
+                warning on
+            end
         end
     end
 end
