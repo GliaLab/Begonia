@@ -25,12 +25,13 @@ classdef View < handle
             obj.zoomables % axis affected by zoom
             
             obj.data = roiman.VersionedData();
-            obj.version = 1;
             
             pos = fig.Position;
             obj.data.write("window_dimensions", [pos(3) pos(4)]);
             
             fig.SizeChangedFcn = @(~, ev) obj.on_resize(ev);
+            
+            obj.invalidate()
         end
         
         
@@ -41,6 +42,11 @@ classdef View < handle
         
         function is_valid = get.valid(obj) 
             is_valid = obj.version >= obj.data.lead_version;
+        end
+        
+        
+        function invalidate(obj) 
+            obj.version = obj.data.lead_version + 1; 
         end
         
         

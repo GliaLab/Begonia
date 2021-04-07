@@ -17,7 +17,7 @@ classdef App < handle
         view_managers
         tools
         
-        update_timer % updates views and detects front window changed
+        update_timer = timer.empty % updates views and detects front window changed
         
         current_vm % ViewManager of front window
         
@@ -27,7 +27,7 @@ classdef App < handle
     
     methods
         function obj = App()
-            REFRESH_RATE = 1/60;
+ 
             
             obj.view_managers = roiman.ViewManager.empty;
             obj.tools = containers.Map();
@@ -37,12 +37,7 @@ classdef App < handle
             
             % ready the update ticker that triggers render operations, but
             % dont start it:
-            obj.update_timer = timer("startdelay", 0.01 ...
-                ,"busymode", "drop" ...
-                , "executionmode", "fixedrate" ...
-                , "period",  round(REFRESH_RATE, 3)...
-                , "timerfcn", @(sender, ev) obj.handle_updates(ev) ...
-            ); 
+            obj.start_timer()
         end
         
         
@@ -96,8 +91,9 @@ classdef App < handle
         % sets the current view:
         function set_active_view_and_manager(obj, view, vm)
             
+            % this line is to combat a state problem that arose previosuly:
             if nargin < 3
-                vm = view.manager;
+                error("code change: view manager now needs to be set explicity")
             end
             
             % set current view as active:
@@ -147,13 +143,40 @@ classdef App < handle
                 pause((1/30) - td);
             end 
         end
+        
+        function start_timer(obj) 
+            REFRESH_RATE = 1/60;
+            obj.stop_timer();
+            
+            % ready the update ticker that triggers render operations, but
+            % dont start it:
+            obj.update_timer = timer("startdelay", 0.01 ...
+                ,"busymode", "drop" ...
+                , "executionmode", "fixedrate" ...
+                , "period",  round(REFRESH_RATE, 3)...
+                , "timerfcn", @(sender, ev) obj.handle_updates(ev) ...
+                , "startdelay", 0.05 ...
+            ); 
+        end
+        
+        function stop_timer(obj)
+            if isempty(obj.update_timer)
+                return;
+            end
+            
+            if obj.update_timer.Running == "on"
+                stop(obj.update_timer);
+            end
+            delete(obj.update_timer);
+            obj.update_timer = timer.empty;
+        end
 
         
         % quittingthe all means deleting all view managers and tools
         function quit(obj)
             import xylobium.shared.write_prefs;
             
-            stop(obj.update_timer);
+            obj.stop_timer();
             
             % save tool positions:
             tool_pos = containers.Map();
@@ -184,7 +207,6 @@ classdef App < handle
             delete(obj);
         end
         
-        
                 
         function handle_view_close(obj, view, vm)
             % are we closing the final view?
@@ -204,12 +226,17 @@ classdef App < handle
                 obj.set_active_view_and_manager(vm.views(end), vm);
             end
             
-            
+            % if there are no more view managers, we'll stop the update
+            % timer:
+            if length(obj.view_managers) < 1
+                obj.stop_timer();
+            end
         end
         
         
         % handles the update timer: 
-        function handle_updates(obj, ~)
+        function handle_updates(obj, ~, sender)
+            
             % each view managers are respoisble for updating themselves:
             for vm = obj.view_managers
                 if isvalid(vm) 

@@ -17,8 +17,6 @@ function app = show(mat, show_tools)
     
     vm.new_view(ts.name, [ch_layer, status_layer]);
     
-
-    
     app.run();
 end
 
