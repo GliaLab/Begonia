@@ -32,6 +32,10 @@ for channel = 1:length(roa_pre_param)
         roa_pre_param(channel).roa_t_smooth = 1;
     end
     
+    use_alternative_baseline = ...
+        isfield(roa_pre_param(channel),'roa_alternative_baseline') && ...
+        ~isempty(roa_pre_param(channel).roa_alternative_baseline);
+    
     %% Chunk columns of pixels to calculate baseline and sigma for large recordings. 
     
     % Define the spatial smoothing kernel. 
@@ -64,8 +68,14 @@ for channel = 1:length(roa_pre_param)
         mat_sub = c.unpad(mat_sub,i);
         
         I = c.chunk_indices_no_pad(i);
-        roa_img_mu(I{:}) = mode(mat_sub,3);
+        if ~use_alternative_baseline
+            roa_img_mu(I{:}) = mode(mat_sub,3);
+        end
         roa_img_sigma(I{:}) = std_alt(mat_sub);
+    end
+    
+    if use_alternative_baseline
+        roa_img_mu(:) = roa_pre_param(channel).roa_alternative_baseline(:);
     end
 
     sigma = median(roa_img_sigma(:));

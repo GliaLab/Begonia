@@ -302,6 +302,71 @@ To save time, the parameters of a single recording can be used to process other 
 
 ![ROA GUI](docs/screenshots/GUI&#32;with&#32;ROA&#32;outlined.png)
 
+## Process a single recording with code
+```matlab
+%% Load tseries
+
+% Enable terminal printout from begonia.
+begonia.logging.set_level(1);
+
+ts_path = 'File/Path/To/Your/recording.tif';
+ts = begonia.scantype.find_scans(ts_path);
+
+%% Pre processing
+pre_param_ch1 = struct;
+pre_param_ch1.roa_enabled = true;
+pre_param_ch1.roa_t_smooth = 1;
+pre_param_ch1.roa_xy_smooth = 2;
+
+pre_param_ch2 = struct;
+pre_param_ch2.roa_enabled = true;
+pre_param_ch2.roa_t_smooth = 1;
+pre_param_ch2.roa_xy_smooth = 2;
+
+% (Optional) Here is how to add a baseline value for each pixel. If the
+% field is empty (as done here for channel 2) or if roa_alternative_baseline
+% is missing from the struct the baseline is calculated by the default 
+% method using mode. Here, for channel 1, the baseline is calculated as the
+% 5th percentile of the first 100 frames.
+mat = ts.get_mat(1);
+pre_param_ch1.roa_alternative_baseline = prctile(mat(:,:,1:100),5,3);
+pre_param_ch2.roa_alternative_baseline = [];
+
+% Which parameters belongs to each channel is decided by order of the
+% structs. Here pre_param_ch1 belongs to channel 1 because it is first in
+% the list.
+roa_pre_param = [pre_param_ch1,pre_param_ch2];
+
+% The pre processing loads the parameters from the key "roa_pre_param", so
+% the parameters must be saved under this name. 
+ts.save_var(roa_pre_param);
+begonia.processing.roa.pre_process(ts);
+
+%% Detect ROA
+roa_param = roa_pre_param;
+
+roa_param(1).roa_threshold = 4;
+roa_param(1).roa_min_size = 4; 
+roa_param(1).roa_min_duration = 0;
+roa_param(1).roa_ignore_mask = false(ts.img_dim);
+roa_param(1).roa_ignore_border = 0;
+
+roa_param(2).roa_threshold = 4;
+roa_param(2).roa_min_size = 4;
+roa_param(2).roa_min_duration = 0;
+roa_param(2).roa_ignore_mask = false(ts.img_dim);
+roa_param(2).roa_ignore_border = 0;
+
+% The processing loads the parameters from the key "roa_param", so
+% the parameters must be saved under this name. 
+ts.save_var(roa_param);
+begonia.processing.roa.filter_roa(ts);
+
+% The results of the ROA detection are stored unde the keywords "roa_table"
+% and "roa_traces". The binary 3D matrix of outlined events are stored
+% under "roa_mask_ch1" and "roa_mask_ch2".
+```
+
 # Processing RoIs, RoAs and RPAs
 
 **Regions-of-interest (RoIs)** can be processed using the `begonia.processing.roi` namespace. When a TSeries is marked in RoIMan, it will have a "roi_table" variable in its metadata (see metadata strategy). 
