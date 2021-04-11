@@ -1,4 +1,10 @@
-function gui_adjust_threshold(ts, model, editor)
+function gui_adjust_threshold(ts,roa_recording_folder, editor)
+if nargin < 2
+    roa_recording_folder = [];
+end
+if nargin < 3
+    editor = [];
+end
 
 if length(ts) > 1
     begonia.logging.log(1,'Multiple TSeries selected, only opening the tool for the first TSeries.')
@@ -17,7 +23,7 @@ app = dataman.support.get_roiman_instance(editor);
 vm = app.open(ts);
 vm.data.write("editor",editor);
 
-roiman.initializers.init_roa(vm);
+roiman.initializers.init_roa(vm,roa_recording_folder);
 
 vm.add_mode(roiman.modes.RoaIgnore());
 

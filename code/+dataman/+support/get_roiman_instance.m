@@ -1,7 +1,8 @@
 function app = get_roiman_instance(editor)
-    if isempty(editor.roiman) || ~isvalid(editor.roiman)
+    if ~isempty(editor) && ~isempty(editor.roiman) && isvalid(editor.roiman)
+        app = editor.roiman;
+    else
         app = roiman.App();
-        editor.roiman = app;
         app.add_tool("manager", @roiman.tools.Manager);
         app.add_tool("channel", @roiman.tools.Channel);
         app.add_tool("guide", @roiman.tools.Guide);
@@ -10,9 +11,10 @@ function app = get_roiman_instance(editor)
         app.add_tool("roa_pre", @roiman.tools.RoaPre);
         app.add_tool("roa_plot", @roiman.tools.RoaPlot);
         app.run();
+    end
+    
+    if ~isempty(editor)
         editor.roiman = app;
-    else
-        app = editor.roiman;
-    end 
+    end
 end
 

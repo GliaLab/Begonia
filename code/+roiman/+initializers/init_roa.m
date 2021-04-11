@@ -1,4 +1,7 @@
-function init_roa(manager)
+function init_roa(manager,roa_recording_folder)
+if nargin < 2
+    roa_recording_folder = [];
+end
 [m_has, m_write, m_read] = manager.data.shorts();
 
 ts = m_read("tseries");
@@ -55,8 +58,7 @@ for chan = 1:ts.channels
     m_write("roa_mask_ch"+chan,roa_mask);
 
     % Load the pre-processed recording. 
-    if m_has("editor") && ~isempty(m_read("editor").get_misc_config('roa_recording_folder'))
-        roa_recording_folder = m_read("editor").get_misc_config('roa_recording_folder');
+    if ~isempty(roa_recording_folder)
         roa_recording_file = sprintf('roa_recording_ch%d_%s.h5',chan,ts.dl_unique_id);
         roa_recording_file = fullfile(roa_recording_folder,roa_recording_file);
     else

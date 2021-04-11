@@ -1,4 +1,7 @@
 function gui_config_manual(ts, model, editor)
+if nargin < 3
+    editor = [];
+end
 
 if length(ts) > 1
     begonia.logging.log(1,'Multiple TSeries selected, only opening the tool for the first TSeries.')

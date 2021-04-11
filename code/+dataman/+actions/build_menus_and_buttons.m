@@ -272,7 +272,7 @@ function actions = roa_menu()
     ac_preproc.has_button = true;
     ac_preproc.button_group = "Regions-of-Activity";
     
-    ac_thresh = Action("Threshold", @begonia.processing.roa.gui_adjust_threshold, true, false);
+    ac_thresh = Action("Threshold", @(ts,~,editor)begonia.processing.roa.gui_adjust_threshold(ts,editor.get_misc_config('roa_recording_folder'),editor), true, false);
     ac_thresh.menu_position = "RoAs";
     ac_thresh.accept_multiple_dlocs = false;
     ac_thresh.can_queue = false;
