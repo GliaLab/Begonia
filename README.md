@@ -283,7 +283,18 @@ roiman.show(mat, true);
 In this intial release, we are focused on TSeries objects and only provide documentation on these. There are however more scan types that can be loaded from a path, such a 3D z-stacks, linescans and single images. All adhere to the `DataLocation` mechanism.
 
 # Regions-of-activity
-Calcium events can be automatically detected with the regions-of-activity algorithm (ROA). The following sections outline how the algorithm can be run through the GUI and directly with code. For details and discussion see the article. 
+Calcium events can be automatically detected with the regions-of-activity algorithm (ROA). The following sections outline how to run the algorithm with 
+the GUI or directly with code. The events are detected with essentialy 2 functions that need configuration, the pre-processing step and the processing step. 
+The pre-processing step requires configuration of the smoothing parameters to estimate the baseline image, the standard deviation of the noise and create a
+intermidate large file for the following processing step. The processing step requires configuration of the detection threshold and parameters for filtering 
+events based on size, duration and location. When the processing is done the output is stored under the variables "roa_table" and "roa_traces". 
+The binary 3D matrix of where true represents detection of events are located under the variables "roa_mask_ch1", "roa_mask_ch2", etc. depending on the 
+channels the events were detected. 
+
+The baseline image is calculated as the most frequent value (aka. the mode) of the pixel time series traces. 
+It is possible to instead use a custom defined baseline image, but this must be done programatically. 
+
+For further details and discussion see the article. 
 
 ## Process a single recording
 A single recording can be analysed from the GUI with the following buttons:
@@ -303,8 +314,13 @@ To save time, the parameters of a single recording can be used to process other 
 ![ROA GUI](docs/screenshots/GUI&#32;with&#32;ROA&#32;outlined.png)
 
 ## Process a single recording with code
+The following code shows how to run the ROA algorithm for a single recording with 2 channels. 
+It also shows how to use a custom baseline image instead of the default calculation using the most frequent value 
+(aka. mode) of the time series of each pixel. 
+
 ```matlab
 %% Load tseries
+% The following code assumes a recording (TSeries) with 2 channels. 
 
 % Enable terminal printout from begonia.
 begonia.logging.set_level(1);
@@ -313,6 +329,11 @@ ts_path = 'File/Path/To/Your/recording.tif';
 ts = begonia.scantype.find_scans(ts_path);
 
 %% Pre processing
+% Here we create the parameters for the pre-processing programatically. It is
+% also possible to create roa_pre_param with the GUI. The GUI cannot be
+% used if we want to use a custom baseline image. The GUI can be opened
+% with the function:
+%       begonia.processing.roa.gui_config_manual(ts)
 pre_param_ch1 = struct;
 pre_param_ch1.roa_enabled = true;
 pre_param_ch1.roa_t_smooth = 1;
@@ -343,6 +364,10 @@ ts.save_var(roa_pre_param);
 begonia.processing.roa.pre_process(ts);
 
 %% Detect ROA
+% Here we create the parameters for the processing programatically. It is
+% also possible to create roa_param with the GUI. The GUI to create and adjust
+% parameters can be opened with the function:
+%       begonia.processing.roa.gui_adjust_threshold(ts)
 roa_param = roa_pre_param;
 
 roa_param(1).roa_threshold = 4;
@@ -360,6 +385,8 @@ roa_param(2).roa_ignore_border = 0;
 % The processing loads the parameters from the key "roa_param", so
 % the parameters must be saved under this name. 
 ts.save_var(roa_param);
+
+% Run the processing.
 begonia.processing.roa.filter_roa(ts);
 
 % The results of the ROA detection are stored unde the keywords "roa_table"
