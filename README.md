@@ -392,6 +392,9 @@ begonia.processing.roa.filter_roa(ts);
 % The results of the ROA detection are stored unde the keywords "roa_table"
 % and "roa_traces". The binary 3D matrix of outlined events are stored
 % under "roa_mask_ch1" and "roa_mask_ch2".
+roa_table = ts.load_var('roa_table');
+roa_traces = ts.load_var('roa_traces');
+roa_mask_ch1 = ts.load_var('roa_mask_ch1');
 ```
 
 # Processing RoIs, RoAs and RPAs
