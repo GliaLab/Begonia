@@ -1,14 +1,14 @@
 # Begonia
 
-**Begonia is a Matlab framework developed by [Glialab](https://www.med.uio.no/imb/english/research/groups/glial-cells/). that helps solve some core challenges of scientific image analysis of 2-photon imaging data of astrocytes.** 
+**Begonia is a Matlab framework developed by [Glialab](https://www.med.uio.no/imb/english/research/groups/glial-cells/) that helps solve some core challenges of scientific image analysis of 2-photon imaging data of astrocytes.** 
 
-**Some of its features are: (1) simple and low maintainence metadata storage strategy, (2) integrating manual steps of analysis with custom Matlab tools, (3) processing of image data agnostic to miscroscope type / image source, (4) joining time series data from multiple measreuments devices and sources, and (5) automatically or semi-amutomaticlaly analysis of imaged cellular and tissue events visible with dynamic calcium sensors**.
+**Some of its features are: (1) simple and low maintainence metadata storage strategy, (2) integrating manual steps of analysis with custom Matlab tools, (3) processing of image data agnostic to miscroscope type / image source, (4) joining time series data from multiple measurement devices and sources, and (5) automatic or semi-automatic analysis of imaged cells and tissue events visible with dynamic calcium sensors**.
 
-Primary focus of development has been on astrocytic calsium signaling, but the software is used for a range of fluoresence indicators recorded by 2-photon laser microscopy. It is possible the frameork can be applied broader than this, but this is the context in which is has arisen.
+The development's primary focus has been on astrocytic calcium signaling, but the software can be used for a range of fluorescence indicators recorded by 2-photon laser microscopy.
 
-The system offers some graphical workflow for non-programmers, and a API for programers. We find that this the combination of GUI-tools and Matlab processing APIs works well in practice, and that researchers supported by others with more programming experience allows high productivity with this framework. 
+The system offers some graphical workflow for non-programmers and an API for programmers. We find that the combination of GUI tools and Matlab processing APIs works well and that researchers supported by others with more programming experience allow high productivity with this framework. 
 
-It is possible for non-programmers to use the framwork initially for overview of data and autmatic anaysis for project piloting or quick reviews of data as it is collected.
+Non-programmers can use the framework initially for an overview of data and automatic analysis for project piloting or quick reviews of data as it is collected.
 
 
 # Known issues ⚠️
@@ -61,29 +61,27 @@ Submodules can be initialized with:
 
 # Metadata
 
-We define metadata as data added to recordings of various modalities that is not part of the original data. 
+We define metadata as data added to recordings of various modalities that are not part of the original data. 
 
-Practical examples can be: a table of regions-of-interest (RoIs) marked in a image recording, the signals from thse RoIs, the name of a laboratory animal used in a EEG recording, or a list states a sleeping animal undergoes during an image recording session.
+Practical examples can be: a table of regions-of-interest (ROIs) marked in an image recording, the signals from these ROIs, the name of a laboratory animal used in an EEG recording, or a list states a sleeping animal undergoes during an image recording session.
 
-Take this example: a mouse runs on a wheel while its pupils are recorded. The experiment yields a file with the wheel's change in degrees over time, and images of the pupil. When the researchers later analyses these raw data, they might calculate the speed in cm/second over time, and the pupil diameter over time. 
+Take this example: a mouse runs on a wheel while the pupils are filmed. The experiment yields a file with the wheel's change in degrees over time and the pupil images. When the researchers later analyze these raw data, they might calculate the speed in cm/second and the pupil diameter. 
 
 Where do these complex derived datatypes go? 
 
-In Begonia, we associate such metadata directly with raw data using the `DataLocation` class, found in the `begonia.data_management` namespace. Most recording data types in begonia derive from this class, meaning its is very easy to add new data to existing data no matter the type.
+In Begonia, we associate such metadata directly with raw data using the `DataLocation` class, found in the `begonia.data_management` namespace. The recording data types in Begonia derive from this class, meaning it is straightforward to add new data to existing data no matter the type.
 
-Any path in the filesystem - files and directories - can be opened as a `DataLocation`, and additional data added. Example: if you have a multipage TIFF file at `C:\imageseq.tiff` this can be opened as a `DataLocation` object in Matlab. Doing so creates a metadata directory associated with the file, and any data associaited with the file can be written to disk, such as the RoIs marked in the recording. 
+Any path in the filesystem - files and directories - can be opened as a `DataLocation`. Example: if you have a multipage TIFF file at `C:\imageseq.tiff` this can be opened as a `DataLocation` object in Matlab. Another example might be a directory of .PNG images at `C:\Data\session-2-july`. Doing so creates a metadata directory associated with the file, and any data associated with the file can be written to disk, such as the ROIs marked in the recording. No additional setup is needed, such as configuring an ontology description or a database. 
 
-No additional setup is needed, such as configuring an ontology description or a database. Another example might a directory of .PNG images at `C:\Data\session-2-july`. It does not matter if the path is a file or a directory. 
+The `MultiTable` can collate data from multiple sources that provide time-series type data to complement this system. If your experiment sessions rely on multiple data sources, you might want to review this namespace further down in this document. 
 
-To compliment this system, the `MultiTable` can collate data from multiple sources that provide time series type data. If your experiment sessions rely on multiple data sources, you might want to review this namespace further down in this document. (We have  discussed a generic approach that could support creation of trial objects with variable data types, but setting up such systems can at this point in time be cumbersome, especially for large datasets).
+`DataLocation` also provides a storage engine system, adding flexibility to where the metadata is stored. By default, the system sets every `DataLocation` to use the `OnPathEngine`, meaning the metadata directory is store adjacent to the path in the filesystem. For files, this means in the file's directory, and for directories, it means inside the directory itself. At GliaLab, we often use the alternative `OffPathEngine`, which saves metadata in a separate directory that must be specified when instancing the data location. 
 
-`DataLocation` also provides a storage engine system, adding flexibility to where the metadata is stored. By default, the system sets every `DataLocation` to use the `OnPathEngine`, meaning the metadata directory is store adjacent to path in the filesystem. For files, this means in the file's directory, and for directories, it means inside the directory itself. At GliaLab we often use the alternative `OffPathEngine` which saves metadata in a separate directory that must be specified when instancing the DataLocation. 
+There also exists an abstract `DataLocationAdapter` class that adds the API to *any* Matlab object that inherits from it. This means Matlab objects create for other purposes can be opened using tools that expect a data location. 
 
-There also exists a abstract `DataLocationAdapter` class that adds the API to *any* Matlab object that inherits from it. This means custom Matlab objects create for other purposes can be opened using tools that expect a DataLocation. 
+These objects are rarely created on their own, however. In Begonia, we tend to inherit from DataLocation for almost all classes that read data from a location. It means that any object representing an image recording, be it volumetric 3D data, single images, line scans or time-series, all will take part in this metadata system.
 
-These objects are rarely created on their own, however. In begonia we tend to inherit from DataLocation for almost all classes that read data from a location. It means that any object representing an image recordng, be it volumetric 3D data, single images, line scans or timeseries, all will take part in this metadata system.
-
-For testing and technical purposes, a DataLocation can be easily instanced:
+For testing and technical purposes, a data location can be easily instanced:
 ```matlab
 import begonia.data_management.DataLocation;
 
@@ -128,17 +126,17 @@ dloc.dloc_storage_engine = OffPathEngine("\Media\SSD_disk2\project_metadata");
 
 # DataLocation Editors
 
-We've found it's often nesseary to perform manual steps implemented in Matlab for may imaging data files in a row. Examples are setting tresholds while seeing an image, marking arease to include or exclude, marking RoIs, performan processings steps etc. 
+We have found it is often necessary to perform manual steps implemented in Matlab for many imaging data files in a row. Examples are setting thresholds while seeing an image, marking areas to include or exclude, marking ROIs, processing steps etc. 
 
-A very simple project could be to record 50 x 5 minute recordings on brain slices before an after a stimuli, marking RoIs and then processing the RoI signals before performin statistics. For the 50 recorinds, the same steps needs to be performed.
+A simple project could record 50 x 5-minute recordings on brain slices before and after a stimulus, marking ROIs and then processing the ROI signals before performing statistics. For the 50 recordings, the same steps need to be performed.
 
-These steps often vary from project to project, and are frequently custom made for the specific project. When there are many recordings to perform steps on, its good to know what steps have been performed on what recording.
+These steps often vary from project to project and are frequently custom-made for the specific project. When there are many recordings, it is good to know what steps have been performed on what recording.
 
-Begonia offers a visual spreadsheed-like tool in `xylobium.dledit.Editor` for this purpose that works on any list of DataLocation or DataLocation derived data. This means all the recordings available from `begonia.scantype`, but also any file or folder on a filesystem, or any custom matlab object (See section on Metadata for more on DataLocation).
+Begonia offers a visual spreadsheet-like tool in `xylobium.dledit.Editor` for this purpose that works on any list of DataLocation or DataLocation derived data.
 
-We'll refer to this tool as the *DataLocation Editor*. Note that begonia's *Data Manager* is implemented in this way. A good place to start for a practical example of a compled DataLocation editor is to have a look at the script `dataman.start()`. 
+We refer to this tool as the *DataLocation Editor*. Note that Begonia's *Data Manager* is implemented in this way. A good place to start for a practical example of a completed DataLocation editor is to have a look at the script `dataman.start()`. 
 
-If you have a list of DataLocations, programatically opening them with an editor is easy. Notice how you can make a column editable by adding a "!" in front of it:
+If you have a list of data locations, programmatically opening them with an editor is easy. Notice how you can make a column editable by adding a "!" in front of it:
 
 ```matlab
 import begonia.data_management.DataLocation;
@@ -162,9 +160,9 @@ This code produces the following view:
 
 ![QA plot for RoIs](docs/screenshots/dledit_1.png)
 
-Actions do be performed on the items in the list can be added by instancing `xylobium.dledit.Action` and providing them as a list of actions. Actions have flags that dislay them as buttons and menu items, optionally with a button group or separator to clarify their relations.
+Actions to be performed on the items in the list can be added by instancing `xylobium.dledit.Action` and providing them as a list of actions. Actions have flags that display them as buttons and menu items, optionally with a button group or separator to clarify their relations.
 
-Note that setting an action's `.can_queue` enables it to be run as a batch operation. These actions are marked with a (b) in the user interface. Simiarly, it's possible to set `.accepts_multiple_dlocs` to true to perform the action once pr. selected item, or false for once pr. item.
+Note that setting an action's `.can_queue` enables it to be run as a batch operation. These actions are marked with a (b) in the user interface. Similarly, it is possible to set `.accepts_multiple_dlocs` to true to perform the action once per selected item or false for once per item.
 
 Continuing with the example, we now add some buttons to the mix:
 
@@ -189,13 +187,13 @@ xylobium.dledit.Editor([dl1, dl2, dl3], [act_A, act_B], ["path", "!A", "B"]);
 
 # Scantypes
 
-Begonia offers a collection of functions to load imaging data and parse assocaited metadata. The library was developed for Brucker Prairie Microscope, but has futher been developed to also load multi-page TIFF stacks and ScanImage metadata. Functions to load imaging data is found in the `begonia.scantype` library. 
+Begonia offers a collection of functions to load imaging data and parse associated metadata. The library was developed for Bruker Prairie Microscope but has further been developed to load multipage TIFF stacks and ScanImage metadata. Functions to load imaging data is found in the `begonia.scantype` library. 
 
-Conceptually, we've declared several abstact classes that specific source readers inherit and override. In addition, these classes uses multiple inheritance to mix in `DataLocation` support. 
+Conceptually, we have declared several abstract classes that specific source readers inherit and override. Also, these classes use multiple inheritance to mix in `DataLocation` support. 
 
 Nota that all these classes must have a constructor that takes a filesystem path to the location of the data.
 
-The library can in this way be extended to support other file formats and microscope, yet retain compatibility with all existing tools begonia offers. 
+The library can in this way be extended to support other file formats and microscopes, yet retain compatibility with all existing tools begonia offers. 
 
 Loading imaging data:
 
@@ -209,14 +207,14 @@ dataman.start(scans)
 
 ## H5 data format + custom metadata
 
-When timer series data gets big, it's often good to have a lazy reader that can rapidly scrub to specific frames in a recording and load only what is needed. Begonia provides such a lazy reader for the H5 data format. This is the default data format of begonia.
+When timer series data gets big, it is often good to have a lazy reader that can rapidly scrub to specific frames in a recording and load only what is needed. Begonia provides such a lazy reader for the H5 data format. This is the default data format of Begonia.
 
 For legacy compatibility in our own data we've also implemented a H5Old reader.
 
 
 ## TSeries-derived types
 
-The most commonly used data format in our research is the `begonia.scantypes.TSeries` data type. The format support multiple channels pr. recording. Initially we supported "cycles" as this was a feature of our microscopes at the time development started, but this is being phased out. The cycle parameter will frequently be ignored.
+The most commonly used data format in our research is the `begonia.scantypes.TSeries` data type. The format support multiple channels per recording. Initially, we supported "cycles" as this was a feature of our microscopes at the time development started, but this is being phased out. The cycle parameter will frequently be ignored.
 
 This class offers the following API:
 
@@ -250,7 +248,7 @@ Note: reference images will be generated on request, which can be time consuming
 * `dt` delta-time, seconds between frames
 * `dx`/`dy` micrometers pr. pixel on the x and y axis
 
-In this example, we will load a scan from a known location. We'll show the average image in a figure, and also show the timeseries using roiman:
+In this example, we will load a scan from a known location. We will show the average image in a figure, and also show the timeseries using roiman:
 
 ```matlab
 % load the scan (can give more than one, here we just get one):
@@ -265,11 +263,11 @@ imagesc(avg_mat);
 ``` 
 ![QA plot for RoIs](docs/screenshots/tseries_1.png)
 
-To get the full data in x, y and time dimentions, used `.get_mat(ch, cy)`. The returned result will depend on the underlying data format. In the example case, the data is a processed H5 tseries, meaning we'll get a lazy H5 reader and can be sure we are not overloading our memory.
+To get the full data in x, y, and time dimensions, use `.get_mat(ch, cy)`. The returned result will depend on the underlying data format. In the example case, the data is a processed H5 TSeries, meaning we will get a lazy H5 reader and can be sure we are not overloading our memory.
 
 The data type of the frames returned by the reader can also change depending on the reader and the data. 
 
-In this example we'll use `roiman.show`. This opens a minimal version of the RoI Manager that takes any Matlab matrix. If the second parameter is true, a control panel will be shown. If false, it displays only the matrix. Note that roiman.show works for all matricies, but does not provide details about the data. To properly open tseries, one would use e.g. roiman.tasks.edit_rois(tseries);
+In this example, we will use `roiman.show`. This opens a minimal version of the ROI Manager that takes any Matlab matrix. If the second parameter is true, a control panel will be shown. If false, it displays only the matrix. Note that roiman.show works for all matricies but does not provide details about the data. To properly open TSseries, one would use e.g. roiman.tasks.edit_rois(tseries);
 
 ```matlab
 % to simply show a matrix, we can get that an visualize it:
@@ -280,19 +278,13 @@ roiman.show(mat, true);
 
 ## Other scantypes
 
-In this intial release, we are focused on TSeries objects and only provide documentation on these. There are however more scan types that can be loaded from a path, such a 3D z-stacks, linescans and single images. All adhere to the `DataLocation` mechanism.
+In this initial release, we are focused on TSeries objects and only provide documentation on these. However, more scan types can be loaded from a path, such as 3D z-stacks, line scans, and single images. All adhere to the `DataLocation` mechanism.
 
 # Regions-of-activity
-Calcium events can be automatically detected with the regions-of-activity algorithm (ROA). The following sections outline how to run the algorithm with 
-the GUI or directly with code. The events are detected with essentialy 2 functions that need configuration, the pre-processing step and the processing step. 
-The pre-processing step requires configuration of the smoothing parameters to estimate the baseline image, the standard deviation of the noise and create a
-intermidate large file for the following processing step. The processing step requires configuration of the detection threshold and parameters for filtering 
-events based on size, duration and location. When the processing is done the output is stored under the variables "roa_table" and "roa_traces". 
-The binary 3D matrix of where true represents detection of events are located under the variables "roa_mask_ch1", "roa_mask_ch2", etc. depending on the 
-channels the events were detected. 
+Calcium events can be automatically detected with the regions-of-activity algorithm (ROA). The following sections outline how to run the algorithm with the GUI or directly with code. The events are detected with essentially two functions that need configuration, the pre-processing step, and the processing step. The pre-processing step requires configuration of the smoothing parameters to estimate the baseline image, the standard deviation of the noise, and create a large intermediate file for the following processing step. The processing step requires configuration of the detection threshold and parameters for filtering events based on size, duration, and location. When the processing is done, the outputs are stored under the variables "roa_table" and "roa_traces". The binary 3D matrix of where 1's represents detected events are located under the variables "roa_mask_ch1", "roa_mask_ch2", etc. depending on the channels the events were detected. 
 
 The baseline image is calculated as the most frequent value (aka. the mode) of the pixel time series traces. 
-It is possible to instead use a custom defined baseline image, but this must be done programatically. 
+It is possible to use a custom-defined baseline image instead, but this must be done programmatically. 
 
 For further details and discussion see the article. 
 
@@ -401,9 +393,9 @@ roa_mask_ch1 = ts.load_var('roa_mask_ch1');
 
 **Regions-of-interest (RoIs)** can be processed using the `begonia.processing.roi` namespace. When a TSeries is marked in RoIMan, it will have a "roi_table" variable in its metadata (see metadata strategy). 
 
-`begonia.processing.roi.extract_signals(tseries)` will extract the signals from the rois in `roi_table`. The this results in the following additional tables being written to metadata:
+`begonia.processing.roi.extract_signals(tseries)` will extract the signals from the rois in `roi_table`. The this results in the following additional tables being writen to metadata:
 
-* `roi_signals_raw` : the raw signals for each RoI
+* `roi_signals_raw` : the raw signals for each ROI
 * `roi_signals_dff` : the delta fluoresence (f - f0) divided by baseline fluoresence (f0)
 * `roi_signals_doughnut` : signals from doughnut rois automatically generated around neuronal somata rois
 
@@ -444,9 +436,6 @@ This will yield the following plots:
 
 ![QA plot for RoIs](docs/screenshots/qa_plot_rois.png)
 ![QA plot for RoI signals](docs/screenshots/qa_plot_roi_signals.png)
-
-**Regions-of-activity (RoAs)** 
-
 
 
 **RoI pixel activity % (RPA%)** is a measure that combines RoIs and RoAs. For simplicity, we try to refer to this as "Activity" in the user interface. 
