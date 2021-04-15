@@ -3,9 +3,9 @@ function plot_splatter(ts, model, editor)
     
     def_conf.start_f = 1;
     def_conf.end_f = ts.frame_count;
-    def_conf.ds_x = 10;
-    def_conf.ds_y = 10;
-    def_conf.ds_z = 100;
+    def_conf.ds_x = 5;
+    def_conf.ds_y = 5;
+    def_conf.ds_z = 50;
 
     c = ts.load_var("splatter_config", def_conf);
     
@@ -21,8 +21,13 @@ function plot_splatter(ts, model, editor)
         z_range = c.start_f:c.ds_z:c.end_f;
         
         mask_ds = mask(x_range, y_range, z_range);
-        begonia.processing.roa.plot_roa_3d(mask_ds, ts.dx, ts.dy, ts.dt)   
+        f = begonia.processing.roa.plot_roa_3d(mask_ds, ts.dx, ts.dy, ts.dt);
+        
+        ax = f.CurrentAxes;
+        title(ax, ts.name + " / " + upper(chan))
     end
+    
+    warning("Splatter from GUI uses low sampling by default. You may want to use the processing.roa.plot_roa_3d() method programatically.")
 
 end
 
