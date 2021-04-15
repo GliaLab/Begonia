@@ -1,11 +1,14 @@
-function app = show(mat, show_tools)
+function app = show(mat, show_tools, app)
+    if nargin < 3
+        app = roiman.App();
+    end
+    
     if nargin < 2
         show_tools = false;
     end
     
     ts = begonia.scantype.matlab.TSeriesMatrixAdapter(mat);
-    
-    app = roiman.App();
+
     if show_tools
         app.add_tool("manager", @roiman.tools.Manager);
         app.add_tool("channel", @roiman.tools.Channel);
@@ -17,6 +20,8 @@ function app = show(mat, show_tools)
     
     vm.new_view(ts.name, [ch_layer, status_layer]);
     
-    app.run();
+    if nargin < 3
+        app.run();
+    end
 end
 
