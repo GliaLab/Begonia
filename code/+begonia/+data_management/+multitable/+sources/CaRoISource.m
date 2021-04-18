@@ -34,7 +34,7 @@ classdef CaRoISource < begonia.data_management.multitable.Source
             seg_category = repmat("*", sz);
             seg_start_abs = repmat(obj.tseries.start_time, sz);
             seg_start_f = repmat(1, sz);
-            seg_end_f = repmat(length(trace), sz);
+            seg_end_f = cellfun(@length,trace);
             transition_f = repmat(missing, sz);
             
             trace = cellfun(@(t) t', trace, 'UniformOutput', false);
