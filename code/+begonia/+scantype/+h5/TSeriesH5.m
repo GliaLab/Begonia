@@ -23,8 +23,6 @@ classdef TSeriesH5 < begonia.scantype.TSeries & ...
         
         zoom
         frame_position_um
-        
-        files
     end
     
     methods
@@ -59,6 +57,9 @@ classdef TSeriesH5 < begonia.scantype.TSeries & ...
             self.frame_count        = metadata.frame_count;
             self.name               = metadata.name;
             self.source             = metadata.source;
+            self.frame_position_um  = metadata.frame_position_um;
+            
+            self.frame_position_um = reshape(self.frame_position_um,1,[]);
             
             if ~isempty(self.start_time_abs)
                 self.start_time_abs.Format = 'uuuu/MM/dd HH:mm:ss';

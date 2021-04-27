@@ -341,7 +341,7 @@ function actions = roa_menu()
     
     
     % PLOTS
-    ac_qa_splatter = Action("Splatter Plot", not_impl, false, true);
+    ac_qa_splatter = Action("Splatter Plot", @plot_splatter, false, true);
     ac_qa_splatter.menu_position = "RoAs";
     ac_qa_splatter.menu_separator = true;
     ac_qa_splatter.accept_multiple_dlocs = false;

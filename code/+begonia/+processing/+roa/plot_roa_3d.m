@@ -1,4 +1,4 @@
-function plot_roa_3d(roa_mask,dx,dy,dt)
+function f = plot_roa_3d(roa_mask,dx,dy,dt)
 
 y = (0:size(roa_mask,1)-1) * dy;
 x = (0:size(roa_mask,2)-1) * dx;
