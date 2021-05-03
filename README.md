@@ -94,7 +94,7 @@ dloc = DataLocation("C:\imageseq.tiff");
 % write metadata:
 dloc.save_var(animal); % save with variable name
 dloc.save_var("gt", genotype); % specify name
-dloc.dave_var("age", age_years); 
+dloc.save_var("age", age_years); 
 
 % clear variable, read data back:
 clearvar dloc
