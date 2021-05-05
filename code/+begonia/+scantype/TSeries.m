@@ -20,9 +20,12 @@ classdef TSeries < begonia.data_management.DataInfo
     end
     
     methods 
-        function img = get_std_img(self,channel,cycle)
+        function img = get_std_img(self,channel,cycle,save_img)
             if nargin < 3
                 cycle = 1;
+            end
+            if nargin < 4
+                save_img = true;
             end
             
             save_key = sprintf('img_std_ch%d_cy%d',channel,cycle);
@@ -46,15 +49,20 @@ classdef TSeries < begonia.data_management.DataInfo
                 end
                 N = size(mat,3);
                 img = (img_sum_sq - img_sum .* img_sum / N) / (N-1);
-                self.save_var(save_key,img);
+                if save_img
+                    self.save_var(save_key,img);
+                end
                 begonia.logging.log(1,'Complete');
             end
         end
 
 
-        function img = get_max_img(self,channel,cycle)
+        function img = get_max_img(self,channel,cycle,save_img)
             if nargin < 3
                 cycle = 1;
+            end
+            if nargin < 4
+                save_img = true;
             end
             
             save_key = sprintf('img_max_ch%d_cy%d',channel,cycle);
@@ -77,14 +85,19 @@ classdef TSeries < begonia.data_management.DataInfo
                 end
                 img = cat(3,imgs{:});
                 img = max(img,[],3);
-                self.save_var(save_key,img);
+                if save_img
+                    self.save_var(save_key,img);
+                end
                 begonia.logging.log(1,'Complete');
             end
         end
 
-        function img = get_avg_img(self,channel,cycle)
+        function img = get_avg_img(self,channel,cycle,save_img)
             if nargin < 3
                 cycle = 1;
+            end
+            if nargin < 4
+                save_img = true;
             end
             
             save_key = sprintf('img_avg_ch%d_cy%d',channel,cycle);
@@ -108,7 +121,9 @@ classdef TSeries < begonia.data_management.DataInfo
                 end
                 img = cat(3,imgs{:});
                 img = sum(img .* frames,3) / sum(frames);
-                self.save_var(save_key,img);
+                if save_img
+                    self.save_var(save_key,img);
+                end
                 begonia.logging.log(1,'Complete');
             end
         end
