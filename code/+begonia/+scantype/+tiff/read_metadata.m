@@ -57,7 +57,8 @@ switch format
         evalc(tif.getTag('ImageDescription'));
         evalc(tif.getTag('Software'));
 
-        metadata.channel_names = SI.hChannels.channelName;
+        metadata.channel_names = ...
+            SI.hChannels.channelName(SI.hChannels.channelSave);
         metadata.channels = length(metadata.channel_names);
         metadata.img_dim(1) = SI.hRoiManager.linesPerFrame;
         metadata.img_dim(2) = SI.hRoiManager.pixelsPerLine;
