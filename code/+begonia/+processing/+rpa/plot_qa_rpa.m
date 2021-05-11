@@ -6,8 +6,9 @@ function plot_qa_rpa(tss)
         roi_table = ts.load_var("roi_table");
 
         dff = ts.load_var("roi_signals_dff", []);
-        rpa_pct = ts.load_var("roi_signal_rpa");
-        rpa_pct = join(roi_table, rpa_pct);
+        rpa_pct = ts.load_var("roi_signals_rpa");
+        rois_dff = join(roi_table,dff);
+        rpa_pct = join(rois_dff, rpa_pct);
 
         % find points to mark roi types on y-axis:
         rpa_pct = sortrows(rpa_pct, "type");
@@ -27,7 +28,7 @@ function plot_qa_rpa(tss)
         
         ax2 = nexttile();
         if ~isempty(dff)
-            imagesc(vertcat(dff.signal_dff{:}) );
+            imagesc(vertcat(rpa_pct.signal_dff{:}) );
             yticks(type_start); yticklabels(types);
         end
         title("Raw signal (df/f0)"); xlabel("Frame (#)"); colorbar(); 
