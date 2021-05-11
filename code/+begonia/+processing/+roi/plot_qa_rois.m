@@ -1,4 +1,4 @@
-function fig = plot_qa_signals(tss, dff_lims)
+function fig = plot_qa_rois(tss, dff_lims)
     import begonia.util.*;
 
     for ts = to_loopable(tss)
@@ -46,4 +46,3 @@ function fig = plot_qa_signals(tss, dff_lims)
         linkaxes(axs)
     end
 end
-
