@@ -15,6 +15,7 @@ function extract_signals(tss)
         extract_roi_signals(ts);
         extract_roi_dff_signals(ts);
         extract_neuron_doughnut_signals(ts);
+        subtract_neuropil(ts);
         extract_channel_traces(ts);
         extract_drift_correction(ts);
     end
