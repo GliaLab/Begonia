@@ -223,7 +223,11 @@ classdef RoIPaint < roiman.Mode
             tab = m_read("roi_table");
           
             short_name = string(begonia.util.make_snowflake_id(char(type)));
-            area_px2 = sum(mask(:));   
+            area_px2 = sum(mask(:));  
+            if area_px2 == 0
+                return;
+            end
+            
             center_x = mean(xs);
             center_y = mean(ys);
             center_z = m_read("z_plane");
