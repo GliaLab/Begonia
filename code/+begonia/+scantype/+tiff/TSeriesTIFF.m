@@ -102,7 +102,7 @@ classdef TSeriesTIFF < begonia.scantype.TSeries & ...
                 % allows reducing the number of dimensions. Here we put
                 % which channel should be fixed. This can change
                 % dimensions from 4D (x,y,channel,frames) to 3D (x,y,frames).
-                mat.vnReducedDimensions = [0,0,channel,0,0];
+                mat.vnReducedDimensions(3) = channel;
                 warning on
             end
         end
