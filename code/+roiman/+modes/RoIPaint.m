@@ -214,6 +214,9 @@ classdef RoIPaint < roiman.Mode
             
             ts = m_read("tseries");
             mask = m_read("roipaint_mask");
+            if sum(mask,'all') == 0
+                return
+            end
             type = m_read("roiedit_roi_type");
             [ys,xs] = find(mask);   % nice trick, Daniel :D
             
