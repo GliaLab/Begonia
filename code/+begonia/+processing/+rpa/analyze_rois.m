@@ -47,7 +47,7 @@ function analyze_rois(ts)
 
     % write results:
     roi_id = roi_table.roi_id;
-    roi_signal_rpa = table(roi_id, signal_rpa_pct);
-    ts.save_var("roi_signal_rpa");
+    roi_signals_rpa = table(roi_id, signal_rpa_pct);
+    ts.save_var("roi_signals_rpa");
 end
 

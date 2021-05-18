@@ -17,6 +17,7 @@ metadata.zoom               = [];
 metadata.start_time         = [];
 metadata.duration           = [];
 metadata.source             = [];
+metadata.frame_position_um  = [];
 
 tmp = jsondecode(h5readatt(path,'/recording','json_metadata'));
 % Assign properties from the struct 'tmp' to the metadata struct.

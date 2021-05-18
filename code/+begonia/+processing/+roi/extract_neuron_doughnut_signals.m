@@ -49,6 +49,7 @@ function roi_table = extract_neuron_doughnut_signals(ts)
         mat = ts.get_mat(ch, 1);
         for i = 1:length(roi_neurons)
             roi = roi_neurons(i);
+            mask = mask_dough{i};
             if ~(roi.channel == ch && roi.type == "NS"); continue; end
             signal_dough(i) = {extract_single_roi_signal(roi, mat, mask)};
         end

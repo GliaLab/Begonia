@@ -94,7 +94,7 @@ dloc = DataLocation("C:\imageseq.tiff");
 % write metadata:
 dloc.save_var(animal); % save with variable name
 dloc.save_var("gt", genotype); % specify name
-dloc.dave_var("age", age_years); 
+dloc.save_var("age", age_years); 
 
 % clear variable, read data back:
 clearvar dloc
@@ -226,7 +226,7 @@ This class offers the following API:
 * `get_max_img(ch, cy)` reference image: max value 
 * `load_var(name, default)` load metadata (from `DataLocation`)
 * `save_var(name, (value))` save metadata (from `DataLocation`)
-* `had_var(name` check if metadata present (from `DataLocation`)
+* `has_var(name` check if metadata present (from `DataLocation`)
 * `saved_vars()` list metadata (from `DataLocation`)
 
 Note: reference images will be generated on request, which can be time consuming. Data Manager provides a batch processing action for these operations.
