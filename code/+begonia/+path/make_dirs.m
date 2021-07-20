@@ -16,6 +16,10 @@ if isempty(path) || exist(path,'dir')
     return
 end
 
+if isstring(path)
+    path = char(path);
+end
+
 path_parts = strsplit(path,filesep);
 path_parts = path_parts(~cellfun('isempty',path_parts));
 
