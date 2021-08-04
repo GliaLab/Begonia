@@ -2,9 +2,10 @@ classdef RoIPaint < roiman.Mode
 
     properties
         HELP_MSG = "Paint rois by clicking or clicking and dragging";
-        GUIDE_TEXT = "*ROI-PAINT*\nPress escape to return to idle mode\n\nDrag: mark roi area\nScroll: to change brush size\nSpace: finish\nTab/shift-type: cycle type\n1-9: set type\n0: list types\ns : toggle subtract brush\nShift-1-9: set channel";
+        GUIDE_TEXT = "*ROI-PAINT*\nPress escape to return to idle mode\n\nDrag: mark roi area\nScroll: to change brush size\nShift-Scroll: move time\nSpace: finish\nTab/shift-type: cycle type\n1-9: set type\n0: list types\ns : toggle subtract brush\nShift-1-9: set channel";
     
         drag_state
+        shift_down
     end
     
     methods
@@ -12,6 +13,7 @@ classdef RoIPaint < roiman.Mode
         function obj = RoIPaint()
             obj = obj@roiman.Mode("ROI:PAINT", "rp");
             obj.drag_state = false;
+            obj.shift_down = false;
         end
         
         
@@ -52,6 +54,12 @@ classdef RoIPaint < roiman.Mode
         function on_keyboard(obj, type, manager, combo, event)
             [~, m_write, m_read] = manager.data.shorts();
             
+            if type == "down"
+                obj.shift_down = event.Key == "shift";
+            else
+                obj.shift_down = false;
+            end
+            
             % space finishes roi:
             if event.Key == "space" && type == "up"
                 roiman.modes.RoIPaint.finish_roi(manager);
@@ -83,13 +91,14 @@ classdef RoIPaint < roiman.Mode
                     m_write("message", "Brush: subtract");
                 end
             end
-
+            
         end
         
         
         function on_mouse(obj, type, manager, view, event)
+            [~, m_write, m_read] = manager.data.shorts();
             
-            if type == "wheel"
+            if type == "wheel" && obj.shift_down == false
                 px = event.VerticalScrollCount;
                 roiman.modes.RoIPaint.set_brush(manager, px, "increment");
                 
@@ -97,7 +106,7 @@ classdef RoIPaint < roiman.Mode
                 % click always stamps a roi:
                 mouse = manager.data.read("mouse_pos");
                 roiman.modes.RoIPaint.add_to_mask(manager, mouse.viewport_x, mouse.viewport_y);
-
+                
                 % start drag state:
                 obj.drag_state = true;
                 
@@ -105,15 +114,32 @@ classdef RoIPaint < roiman.Mode
                 % continue drawing if we are in the draw state:
                 mouse = manager.data.read("mouse_pos");
                 roiman.modes.RoIPaint.add_to_mask(manager, mouse.viewport_x, mouse.viewport_y);
-   
+                
             elseif type == "up"
                 obj.drag_state = false;
+            end
+            
+            if obj.shift_down && type == "wheel"
+                dist = event.VerticalScrollCount * event.VerticalScrollAmount;
+                frame = m_read("current_frame");
+                frames = m_read("frames");
                 
+                frame = frame - dist;
+                if frame <= 0
+                    frame = frames(end) + frame;
+                    m_write("message", "LOOPED TO END");
+                elseif frame > frames(end)
+                    frame = frame - frames(end);
+                    m_write("message", "LOOPED TO START");
+                end
+                manager.goto(frame)
             end
             
         end
         
     end
+    
+  
     
     
     methods (Static)
