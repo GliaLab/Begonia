@@ -34,7 +34,8 @@ end
 roi_id = roi_table.roi_id;
 Ns_subtracted = repmat({nan(1, ts.frame_count)}, height(roi_table), 1);
 Ns_subtracted(neu_idx) =  Ns_subtract;
-roi_signals_subtracted = table(roi_id, Ns_subtracted);
+signal_subtracted_dff = Ns_subtracted;
+roi_signals_subtracted = table(roi_id,signal_subtracted_dff);
 ts.save_var('roi_signals_dff_subtracted',roi_signals_subtracted)
 
 end
