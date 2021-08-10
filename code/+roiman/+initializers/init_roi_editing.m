@@ -7,8 +7,8 @@ function init_roi_editing(manager)
     
     type = ["AS", "AP", "Gp", "AE", "Cap", "NS", "Np", "ND", "NA"]';
     desc = ["Astro. somata", "Astro. process", "Gliopil", "Astro. endfeet", "Astro. capillary", "Neu. somata", "Neuropil", "Neu. dendrite", "Neu. axon"]';
-
-    m_write("roiedit_roi_types_available", table(type, desc));
+    color = {"Green", [0.5 .8 .1], [.63 .90 .02], [.067 .48 0], [.24 .09 .66],"Red", [.96 .45 .027], [.96 .65 .027], [.75 .5 0]}'; 
+    m_write("roiedit_roi_types_available", table(type, desc,color));
     m_write("roiedit_roi_type", "AS");
     
     % start with no rois selected:

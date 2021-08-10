@@ -76,6 +76,9 @@ classdef Rois < roiman.ViewModule
                 return;
             end
             
+             obj.hide_rois(manager,view)
+            
+            
             if (m_flagged("rois_rerender_flagged") || v_flagged("rois_rerender_flagged")) && m_has("roi_table")
                 obj.update_roi_splines(manager, view);
                 obj.update_roi_relations(manager, view);
@@ -85,7 +88,8 @@ classdef Rois < roiman.ViewModule
                     disp("Splines updated");
                 end
             end
-            
+                                                 
+        
             % update selection:
             if m_flagged("rois_selection_flagged")
                 obj.update_selection(manager, view);
@@ -106,7 +110,7 @@ classdef Rois < roiman.ViewModule
                 end
             end
             
-            % draw selection drag rect, if any:
+        % draw selection drag rect, if any:
             if m_flagged("rois_dragpoints_flagged") 
                 obj.update_drag_rect(manager, view);
             end
@@ -122,9 +126,29 @@ classdef Rois < roiman.ViewModule
             end
         end
         
+        
+        function hide_rois(obj,manager,view)
+            [~, ~, m_read] = manager.data.shorts();
+            [~, ~, v_read] = view.data.shorts();
+            
+            ch = v_read("channel");
+            splinemap = v_read("roiview_splines");
+            splines = splinemap.values;
+            splines = [splines{:}];
+            splines_idx = arrayfun(@(s) s.UserData.channel == ch,splines);
+            splines_ch = splines(splines_idx);
+            
+            if m_read("roi_show_rois")
+                set(splines_ch,"Visible","on")
+            else
+                set(splines_ch,"Visible","off")
+            end
+        end
+
+        
         function update_drag_rect(obj, manager, view)
             [~, ~, m_read, ~] = manager.data.shorts();
-            [~, v_write, v_read, ~] = view.data.shorts();
+            [~, v_write, ~, ~] = view.data.shorts();
             
             %ax = v_read("roiview_ax");
             drag_points = m_read("roiselect_drag_points", []);
@@ -141,13 +165,13 @@ classdef Rois < roiman.ViewModule
         
         
         function update_roi_splines(obj, manager, view)
-            [~, m_write, m_read] = manager.data.shorts();
+            [~, ~, m_read] = manager.data.shorts();
             [~, v_write, v_read] = view.data.shorts();
   
+            
             chan = v_read("channel");
             [roi_table, v] = m_read("roi_table");
             splinemap = v_read("roiview_splines");
-
             
             % remove any splines in the map that is not in the roi table:
             % these have been removed since last update:
@@ -161,16 +185,16 @@ classdef Rois < roiman.ViewModule
             % now the other way - paint any rois that are in the table, but
             % not in the map:
             n = height(roi_table);
+            roi_c = m_read("roiedit_roi_types_available");
             for i = 1:n
                 roi = table2struct(roi_table(i,:));
                 if ~any(contains(splinemap.keys, roi.roi_id))
-                    [B,~,~,~] = bwboundaries(roi.mask);
-                    
+                    [B,~,~,~] = bwboundaries(roi.mask);                    
                     handles = cell.empty;
                     for k = 1:length(B)
                         boundary = B{k};
-
-                        h = plot(obj.ax, boundary(:,2), boundary(:,1), 'LineWidth', 2, 'Color', 'white');
+                        c = roi_c.color{roi_c.type == roi.type};
+                        h = plot(obj.ax, boundary(:,2), boundary(:,1), 'LineWidth', 2, 'Color', c);
                         h.UserData = roi;
                         h.ButtonDownFcn = @(~,~) disp("Event");
                         handles = [handles, h];
@@ -193,7 +217,7 @@ classdef Rois < roiman.ViewModule
             chan = v_read("channel");
             roi_table = m_read("roi_table");
             roi_table = roi_table(roi_table.channel == chan,:);
-            
+            roi_c = m_read("roiedit_roi_types_available");
             % clear existing relation arrows:
             for key = relmap.keys
                 delete(relmap(key{:}));
@@ -211,7 +235,7 @@ classdef Rois < roiman.ViewModule
                 if ismissing(roi.parent_id)
                     continue;
                 end
-                
+                c = roi_c.color{roi_c.type == roi.type};
                 % FIXME: annotations work on currennt figure, which is not
                 % good - we want this to render in the axis?
                 
@@ -222,7 +246,7 @@ classdef Rois < roiman.ViewModule
                 ys = 1 - (round([parent.center_y; roi.center_y]) / dims(2));
                 %h = annotation('arrow', xs, ys);
                 h = line(xs, ys);
-                h.Color = "white";
+                h.Color = c;
 %                 h.LineWidth = .5;
 %                 h.HeadWidth = 3;
 %                 h.HeadLength = 3;
@@ -243,6 +267,7 @@ classdef Rois < roiman.ViewModule
             chan = v_read("channel");
             roi_table = m_read("roi_table");
             roi_table = roi_table(roi_table.channel == chan,:);
+            roi_c = m_read("roiedit_roi_types_available");
             
             % clear existing relation arrows:
             for key = labmap.keys
@@ -258,7 +283,8 @@ classdef Rois < roiman.ViewModule
             % recreate:
             for r = 1:height(roi_table)
                 roi = table2struct(roi_table(r,:));
-                h = text(obj.ax, roi.center_x, roi.center_y, roi.short_name, 'Color','white', 'FontSize',6);
+                c = roi_c.color{roi_c.type == roi.type};
+                h = text(obj.ax, roi.center_x, roi.center_y, roi.short_name, 'Color',c, 'FontSize',6);
                 labmap(roi.roi_id) = h;
             end
             
@@ -271,16 +297,18 @@ classdef Rois < roiman.ViewModule
             
             [selected, v] = m_read("roiedit_selected");
             splinemap = v_read("roiview_splines");
+            roi_c = m_read("roiedit_roi_types_available");
+            cc = containers.Map(roi_c.type,roi_c.color);
             
             for key = splinemap.keys
                 splines = splinemap(key{:});
                 if any(contains(selected, key{:}))
                     for spline = splines
-                        spline.Color = "red";
+                        spline.Color = "white";
                     end
                 else
                     for spline = splines
-                        spline.Color = "white";
+                        spline.Color = cc(spline.UserData.type);
                     end
                 end
             end

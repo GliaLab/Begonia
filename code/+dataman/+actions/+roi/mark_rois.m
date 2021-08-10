@@ -15,7 +15,8 @@ function mark_rois(ts, model, editor)
     % sets up initial roi editing values
     vm.add_mode(roiman.modes.RoIPaint()); % rp - roi painting
     vm.add_mode(roiman.modes.RoIPolygon()); % rs - selection and grouping 
-    vm.add_mode(roiman.modes.RoISelect()); % rs - selection and grouping 
+    vm.add_mode(roiman.modes.RoISelect());% rs - selection and grouping 
+    vm.add_mode(roiman.modes.Measure());
     
     vm.new_view(ts.name, [ch2, status rois roipaint roipoly]);
 end
