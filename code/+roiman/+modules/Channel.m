@@ -12,6 +12,9 @@ classdef Channel < roiman.ViewModule
         
         ax
         img
+        
+        scale
+        scale_text
     end
     
     methods
@@ -43,13 +46,14 @@ classdef Channel < roiman.ViewModule
             v_write("channel_colormap", "begonia.colormaps.turbo");
             v_write("channel_low", 0);
             v_write("channel_high", 1);
+            v_write("channel_scale",0);
             
             % flags to trigger redraw when needed only:
             m_flag_on = ["current_frame", "tseries"];
             v_flag_on = [...
                 "channel", "viewport", "channel_mode" ...
                 , "channel_samples", "channel_xy_smoothing" ...
-                , "channel_colormap", "channel_low", "channel_high"];
+                , "channel_colormap", "channel_low", "channel_high","channel_scale"];
             
             manager.data.assign_changeflag(m_flag_on, "channel_redraw_flagged");
             view.data.assign_changeflag(v_flag_on, "channel_redraw_flagged");
@@ -91,6 +95,7 @@ classdef Channel < roiman.ViewModule
             low = v_read('channel_low');
             high = v_read('channel_high');
             cmap = v_read('channel_colormap');
+            scl = v_read("channel_scale");
             
             mat = m_read("matrix_ch_" + chan);
             
@@ -136,6 +141,52 @@ classdef Channel < roiman.ViewModule
                 lims(2) = lims(2) + 1;
             end
             obj.ax.CLim = lims;
+            
+
+            % Add Scale
+            if  scl  == 1
+                delete(obj.scale)
+                delete(obj.scale_text)
+                vp = v_read("viewport");
+                tseries = m_read("tseries");
+                try
+                    real_u = tseries.dx;
+                    units = " um";
+                catch
+                    real_u = 1;
+                    units = " px";                 
+                end
+
+                % Size/Position scale
+                scl_st = round(vp([3,4])/10);
+                scl_start = scl_st(1) + vp(1);
+                scl_end = 2.5*scl_st(1)  + vp(1);
+                scl_length = scl_end - scl_start;
+                scl_y = scl_st(2) + vp(2);
+                
+                % Scale color
+                if cmap == "Autumn" || cmap == "Hot"
+                    c = [1 1 1];
+                else
+                    c = [1 0 0];
+                end
+                
+                % Scale bar
+                obj.scale = plot(ax,[scl_start,scl_end],[scl_y,scl_y],"LineWidth",4,"Color",c);              
+                
+                % Scale text
+                pixel_mcrmeter = round(scl_length*real_u,1);
+                x_pos = scl_start + scl_length/2;                                        
+                y_pos = scl_y + 0.25*(scl_y - vp(2));
+                txt = string(pixel_mcrmeter) + units;
+                obj.scale_text = text(ax,x_pos, y_pos,txt, "HorizontalAlignment","center",...
+                    "FontUnits","normalized","FontWeight","bold","FontSize",0.04,"Color",c);
+            else
+                delete(obj.scale)
+                delete(obj.scale_text)
+            end
+            
+            
         end
         
         function img_out = spatially_smooth_img(obj,view,img)
