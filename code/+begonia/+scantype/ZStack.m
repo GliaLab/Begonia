@@ -3,7 +3,6 @@ classdef ZStack < handle & begonia.data_management.DataInfo
     %   Detailed explanation goes here
     
     properties
-        frame_position_um
         dzd
     end
     

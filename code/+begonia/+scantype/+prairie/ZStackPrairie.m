@@ -2,7 +2,6 @@ classdef ZStackPrairie < begonia.scantype.ZStack ...
         & begonia.scantype.prairie.PrairieOutput
 
     properties
-        files
         dz
     end
     
@@ -17,8 +16,9 @@ classdef ZStackPrairie < begonia.scantype.ZStack ...
                     'begonia:load:not_zstack_sequence_type', ...
                     'Not a zstack according to type');
                 
+            metadata = obj.read_metadata();
             obj.files = cellfun(@(filename) [obj.path,filesep,filename], ...
-            obj.metadata.files, 'UniformOutput',false);
+                metadata.files, 'UniformOutput', false);
             
             files = obj.files(:);
             
@@ -79,7 +79,7 @@ classdef ZStackPrairie < begonia.scantype.ZStack ...
          
         function mat = get_mat(self,cycle,channel)
             files = self.files(cycle,channel,:);  %#ok<*PROPLC>
-            mat = begonia.frame_providers.PrarieFrameProvider(files);
+            mat = begonia.scantype.prairie.PrarieFrameProvider(files);
         end
     end
 end
