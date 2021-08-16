@@ -87,7 +87,7 @@ classdef PrairieOutput < handle ...
                     dur = seconds(metadata.relative_times(end)+metadata.dt(1));
                 case 'Single'
                     type = 'Single';
-                    obj.start_time_abs = metadata.start_time;
+                    start_time = metadata.start_time;
                     dur = seconds(metadata.dt(1));
             end
             dur.Format = 'hh:mm:ss.SSS';

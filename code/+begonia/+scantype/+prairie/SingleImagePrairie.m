@@ -1,10 +1,6 @@
 classdef SingleImagePrairie < begonia.scantype.SingleImage ... 
         & begonia.scantype.prairie.PrairieOutput
     
-    properties
-        frame_position_um
-    end
-    
     methods
         function obj = SingleImagePrairie(path)
             obj@begonia.scantype.prairie.PrairieOutput(path);
@@ -23,11 +19,6 @@ classdef SingleImagePrairie < begonia.scantype.SingleImage ...
             else
                 mat = imread(paths{channel});
             end
-        end
-        
-        function pos = get.frame_position_um(obj)
-            import begonia.scantype.prairie.*;
-            pos = get_coordinate_from_tsxml(obj.xml_file);
         end
     end
 end
