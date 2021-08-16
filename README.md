@@ -21,7 +21,7 @@ Please be aware of the following when using the RoI Manager ("roiman"):
 
 # Paper 
 
-Bjørnstad DM, Åbjørsbråten KS, Hennestad E, Cunen C, Hermansen GH, Bojarskaite L, et al. [Begonia—A Two-Photon Imaging Analysis Pipeline for Astrocytic Ca2+ Signals](https://doi.org/10.3389/fncel.2021.681066). Front Cell Neurosci. 2021;15(May):1–12.
+Bjørnstad DM, Åbjørsbråten KS, Hennestad E, Cunen C, Hermansen GH, Bojarskaite L, Pettersen KH, Vervaeke, K, Enger, R. [Begonia—A Two-Photon Imaging Analysis Pipeline for Astrocytic Ca2+ Signals](https://doi.org/10.3389/fncel.2021.681066). Front Cell Neurosci. 2021;15(May):1–12.
 
 # External code
 Wouter Falkena (2021). [xml2struct](https://www.mathworks.com/matlabcentral/fileexchange/28518-xml2struct), MATLAB Central File Exchange. Retrieved August 16, 2021.
