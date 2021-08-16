@@ -36,6 +36,10 @@ classdef PrairieOutput < handle ...
                 path(end) = [];
             end
             
+            if isstring(path)
+                path = char(path);
+            end
+            
             obj@begonia.data_management.DataLocation(path);
             
             assert(exist(fullfile(path,'References'),'dir') == 7, ...
