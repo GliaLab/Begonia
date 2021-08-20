@@ -1,7 +1,6 @@
 function reread_xml_metadata(tseries)
 
     for ts = begonia.util.to_loopable(tseries)
-        asdata
         if ~isa(ts, "begonia.scantype.h5_old.TSeriesH5Old")
             error("TSeries must be H5Old format for this method to work")
         end

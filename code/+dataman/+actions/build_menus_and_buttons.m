@@ -325,6 +325,15 @@ function actions = roa_menu()
     ac_proc_rpa.has_button = true;
     ac_proc_rpa.button_group = "Activity";
     
+    ac_proc_rpa_comp_deets = Action("Extract individual events table", @(ts,~,~)begonia.processing.rpa.extract_signals(ts), true, false);
+    ac_proc_rpa_comp_deets.menu_position = "RoAs";
+    ac_proc_rpa_comp_deets.menu_separator = false;
+    ac_proc_rpa_comp_deets.accept_multiple_dlocs = false;
+    ac_proc_rpa_comp_deets.can_queue = true;
+    ac_proc_rpa_comp_deets.can_execute_without_dloc = false;
+    ac_proc_rpa_comp_deets.has_button = false;
+    ac_proc_rpa_comp_deets.button_group = "Activity";
+    
     ac_qa_rpa = Action("Plot RoI Activity", @(ts, ~, ~) begonia.processing.rpa.plot_qa_rpa(ts), false, true);
     ac_qa_rpa.menu_position = "RoAs";
     ac_qa_rpa.accept_multiple_dlocs = false;

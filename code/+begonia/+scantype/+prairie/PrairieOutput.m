@@ -112,6 +112,8 @@ classdef PrairieOutput < handle ...
             [~,name,~] = fileparts(metadata.xml_file);
             obj.name = name;
             obj.xml_file = fullfile(obj.path, [name,'.xml']);
+            
+            
 
             obj.files = cellfun(@(filename) [obj.path,filesep,filename], ...
                 metadata.files, 'UniformOutput',false);
