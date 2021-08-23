@@ -6,7 +6,7 @@ function eqtab = equisize_left(traces, eq_strat, dt)
         end_f = min(arrayfun(@(tr) length(tr{:}), eqtab.trace));
     elseif eq_strat == "padd"
         end_f = max(arrayfun(@(tr) length(tr{:}), eqtab.trace));
-        error("Not implmeented");
+        error("Padd method not implmeented - only trim, sorry");
     end
     
     eqtab.trace = cellfun(@(t) t(1:end_f), eqtab.trace, "UniformOutput", false);
