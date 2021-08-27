@@ -32,7 +32,7 @@ function actions = get_recents()
         ac.accept_multiple_dlocs = false;
         ac.can_execute_without_dloc = true;
         
-        actions = [actions ac];
+        actions = [actions ac]; %#ok<AGROW>
         if length(actions) > 0
             actions(1).menu_separator = true;
         end
@@ -325,9 +325,9 @@ function actions = roa_menu()
     ac_proc_rpa.has_button = true;
     ac_proc_rpa.button_group = "Activity";
     
-    ac_proc_rpa_comp_deets = Action("Extract individual events table", @(ts,~,~)begonia.processing.rpa.extract_signals(ts), true, false);
+    ac_proc_rpa_comp_deets = Action("Extract individual events table", @(ts,~,~)begonia.processing.roa.save_roa_events_table(ts) , true, false);
     ac_proc_rpa_comp_deets.menu_position = "RoAs";
-    ac_proc_rpa_comp_deets.menu_separator = false;
+    ac_proc_rpa_comp_deets.menu_separator = true;
     ac_proc_rpa_comp_deets.accept_multiple_dlocs = false;
     ac_proc_rpa_comp_deets.can_queue = true;
     ac_proc_rpa_comp_deets.can_execute_without_dloc = false;
@@ -369,6 +369,6 @@ function actions = roa_menu()
     
     actions = [ac_toggle_tmpl ac_proc_tmpl ...
         ac_auto_conf_preproc ac_conf_preproc ac_preproc ac_thresh ac_proc ac_clean...
-        ac_proc_rpa ac_qa_rpa ac_qa_rpa_cmp ...
+        ac_proc_rpa ac_qa_rpa ac_qa_rpa_cmp ac_proc_rpa_comp_deets ...
         ac_qa_splatter ac_qa_mask ];
 end

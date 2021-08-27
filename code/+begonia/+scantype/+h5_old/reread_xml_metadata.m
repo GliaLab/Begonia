@@ -10,7 +10,7 @@ function reread_xml_metadata(tseries)
 
         ts.channel_names        = metadata.channel_names;
         ts.channels             = metadata.channels;
-        ts.dt                   = metadata.dt;
+        ts.dt                   = metadata.dt(1);
         ts.dx                   = metadata.dx;
         ts.dy                   = metadata.dx;
         ts.cycles               = metadata.cycles;
