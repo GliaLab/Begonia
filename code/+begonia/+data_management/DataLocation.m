@@ -64,6 +64,11 @@ classdef DataLocation < handle & matlab.mixin.Heterogeneous
         end
         
         
+        function open_metadata_dir(self)
+            begonia.util.open_path_externally(self.dloc_metadata_dir)
+        end
+        
+        
         function dl_ensure_has_uuid(obj)
             if isprop(obj, "uuid") & ~isempty(obj.uuid) 
                 return; 
