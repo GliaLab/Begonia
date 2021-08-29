@@ -15,13 +15,17 @@ else
     dt = ts.dt;
 end
 
-roa_param_hidden = ts.load_var('roa_param',[]);
-%roa_param_hidden = ts.load_var('roa_param_hidden',[]);
-
-if isempty(roa_param_hidden)
-    return;
+% get processing parameter - we prefer hidden:
+if ts.has_var("roa_param_hidden")
+    roa_param_hidden = ts.load_var('roa_param_hidden');
+elseif ts.has_var("roa_param")
+    roa_param_hidden = ts.load_var('roa_param');
+else
+    error("tserie has neither roa_param or roa_param_hidden variable - missing processing step?")
 end
 
+
+% extra data pr. channel, and create table:
 roa_traces = struct;
 roa_tables = {};
 

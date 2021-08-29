@@ -6,6 +6,7 @@ if isempty(dt); dt = nan; end
 CC = bwconncomp(mat,6);
 %%
 roa_table = table;
+roa_id = zeros(CC.NumObjects, 1);
 roa_start_frame = zeros(CC.NumObjects,1);
 roa_end_frame = zeros(CC.NumObjects,1);
 roa_xy_area_pix = zeros(CC.NumObjects,1);
@@ -23,6 +24,7 @@ for i = 1:CC.NumObjects
     xy_size = unique(y*(CC.ImageSize(2)+1)+x);
     xy_size = length(xy_size);
     
+    roa_id(i) = i;
     roa_start_frame(i) = t(1);
     roa_end_frame(i) = t(end) + 1;
     roa_xy_area_pix(i) = xy_size;
@@ -30,7 +32,7 @@ for i = 1:CC.NumObjects
     roa_center(i,:) = round(mean([y,x,t],1));
 end
 
-roa_table = table(roa_start_frame,roa_end_frame,roa_xy_area_pix,roa_volume_pix,roa_center);
+roa_table = table(roa_id, roa_start_frame,roa_end_frame,roa_xy_area_pix,roa_volume_pix,roa_center);
 roa_table.roa_start = (roa_table.roa_start_frame - 1) * dt;
 roa_table.roa_end = (roa_table.roa_end_frame - 1) * dt;
 roa_table.roa_xy_area = roa_table.roa_xy_area_pix * dx * dy;
