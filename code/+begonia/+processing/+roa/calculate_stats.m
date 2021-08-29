@@ -15,7 +15,8 @@ else
     dt = ts.dt;
 end
 
-roa_param_hidden = ts.load_var('roa_param_hidden',[]);
+roa_param_hidden = ts.load_var('roa_param',[]);
+%roa_param_hidden = ts.load_var('roa_param_hidden',[]);
 
 if isempty(roa_param_hidden)
     return;

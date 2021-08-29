@@ -35,7 +35,7 @@ roa_table.roa_start = (roa_table.roa_start_frame - 1) * dt;
 roa_table.roa_end = (roa_table.roa_end_frame - 1) * dt;
 roa_table.roa_xy_area = roa_table.roa_xy_area_pix * dx * dy;
 roa_table.roa_volume = roa_table.roa_volume_pix * dx * dy * dt;
-roa_table.roa_duration = (roa_table.roa_end - roa_table.roa_start) * dt;
+roa_table.roa_duration = (roa_table.roa_end - roa_table.roa_start);
 
 end
 
