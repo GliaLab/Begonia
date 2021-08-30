@@ -461,16 +461,16 @@ begonia.processing.rpa.plot_qa_rpa(ts);
 
 Active fraction values are given as % of the RoI that has activity. The baseline is 0, which means event detection is easier. An active pixel in a RoI can be part of a larger activity that the RoI only partially covers. Active fraction is also subject to the RoA algorithm thresholding, temporal and spatial smoothing, and finally RoA duration and sensitivity filtering.
 
-## Associating individual regions-of-activity with roi types
+## Associating individual regions-of-activity with RoI-types
 
 ![QA plot for RoIs](docs/screenshots/roa_to_roitype_match.png)
 
-*Illustration: RoA centers (marks) inside a Roi type.*
+*Illustration: RoA centers (marks) inside a RoI-type.*
 
-If you need to review RoAs that occur within specific roi types (e.g. a cellular compartment), you can use the ```make_roa_roitype_table``` function. This function generates a table stored as a datalocation variable called ```roa_roitype_table``` that can be used to filter the RoA table.
+If you need to review RoAs that occur within specific RoI-types (e.g. a cellular compartment), you can use the ```make_roa_roitype_table``` function. This function generates a table stored as a datalocation variable called ```roa_roitype_table``` that can be used to filter the RoA table.
 
 
-Note: included rois must have their *center* of activity inside one of the RoIs of the given type of count. A RoA could occur in several places, if RoIs overlap.
+Note: included RoIs must have their *center* of activity inside one of the RoIs of the given type of count. A RoA could occur in several places, if RoIs overlap.
 
 ```matlab
 import begonia.processing.rpa.make_roa_roitype_table
@@ -483,7 +483,7 @@ roa_table = ts.load_var("roa_table");
 roa_roitype_table = ts.load_var("roa_roitype_table");
 roa_roitype_table = join(roa_roitype_table, roa_table);
 
-% filter for glipil, channel 1:
+% filter for gliopil, channel 1:
 gp_roas = roa_roitype_table(roa_roitype_table.roi_type == "Gp" ...
     & roa_roitype_table.channel == 1,:)
 ```
