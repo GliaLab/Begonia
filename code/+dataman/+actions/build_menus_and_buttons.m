@@ -325,7 +325,7 @@ function actions = roa_menu()
     ac_proc_rpa.has_button = true;
     ac_proc_rpa.button_group = "Activity";
     
-    ac_proc_rpa_comp_deets = Action("Extract individual events table", @(ts,~,~)begonia.processing.roa.save_roa_events_table(ts) , true, false);
+    ac_proc_rpa_comp_deets = Action("Extract RoA-RoI type table", @(ts,~,~)begonia.processing.rpa.make_roa_roitype_table(ts) , true, false);
     ac_proc_rpa_comp_deets.menu_position = "RoAs";
     ac_proc_rpa_comp_deets.menu_separator = true;
     ac_proc_rpa_comp_deets.accept_multiple_dlocs = false;

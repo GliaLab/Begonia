@@ -463,7 +463,12 @@ Active fraction values are given as % of the RoI that has activity. The baseline
 
 ## Associating individual regions-of-activity with roi types
 
+![QA plot for RoIs](docs/screenshots/roa_to_roitype_match.png)
+
+*Illustration: RoA centers (marks) inside a Roi type.*
+
 If you need to review RoAs that occur within specific roi types (e.g. a cellular compartment), you can use the ```make_roa_roitype_table``` function. This function generates a table stored as a datalocation variable called ```roa_roitype_table``` that can be used to filter the RoA table.
+
 
 Note: included rois must have their *center* of activity inside one of the RoIs of the given type of count. A RoA could occur in several places, if RoIs overlap.
 
