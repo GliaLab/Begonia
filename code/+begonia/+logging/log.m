@@ -14,7 +14,7 @@ msg = sprintf(varargin{:});
 
 if BEGONIA_VERBOSE >= level
     now = datetime('now');
-    now.Format = 'HH:mm:ss';
+%     now.Format = 'HH:mm:ss';
     now = char(now);
     msg = sprintf('[%s] : %s',now,msg);
     disp(msg);
