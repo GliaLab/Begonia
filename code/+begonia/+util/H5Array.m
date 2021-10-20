@@ -33,7 +33,7 @@ classdef H5Array
             p.parse(varargin{:})
             in = p.Results;
             
-            self.filename = in.filename;
+            self.filename = char(in.filename);
             self.dim = in.dim;
             self.datatype = in.datatype;
             self.dataset_name = in.dataset_name;
