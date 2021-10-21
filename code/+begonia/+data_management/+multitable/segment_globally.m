@@ -1,6 +1,8 @@
-function segtab = segment_globally(traces, clfr, dt, cats)
+function segtab = segment_globally(traces, clfr, dt, cats,do_idcats)
     import begonia.util.to_loopable;
     import begonia.data_management.multitable.classifier_to_segtab;
+    
+    if nargin < 5, do_idcats = false; end
 
     if isstring(cats)
         cats = categorical(cats);
@@ -9,7 +11,7 @@ function segtab = segment_globally(traces, clfr, dt, cats)
     traces.tmp_id = (1:height(traces))';
     
     % for global segmenting, we segment all traces by same segtab:
-    segtab = classifier_to_segtab(clfr, dt, cats);
+    segtab = classifier_to_segtab(clfr, dt, cats,do_idcats);
     segs = arrayfun(@(id, t, dt, absst) process_row(id, t, dt, absst, segtab) ...
         , traces.tmp_id, traces.trace, traces.trace_dt, traces.seg_start_abs ...
         , "UniformOutput", false);
@@ -35,11 +37,12 @@ function rowsegs = process_row(id, srctr, dt, abs_start, segtab)
     seg_end_f(seg_end_f > length(srctr)) = length(srctr);
     tmp_id = repmat(id, size(seg_start_f));
     seg_category = segtab.seg_category;
+    seg_id = segtab.seg_id;
     
     trace = arrayfun(@(s, e) srctr(s:e) ...
         , seg_start_f, seg_end_f...
         , "UniformOutput", false);
     
-    rowsegs = table(tmp_id, trace, seg_category, seg_start_abs, seg_start_f, seg_end_f);
+    rowsegs = table(tmp_id, trace, seg_id, seg_category, seg_start_abs, seg_start_f, seg_end_f);
 end
 
