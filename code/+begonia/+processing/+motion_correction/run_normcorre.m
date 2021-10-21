@@ -1,5 +1,8 @@
-function ts_out = run_normcorre(ts,output_path,options,output_format)
+function ts_out = run_normcorre(ts, output_path, options, output_format, use_memmap)
 
+if nargin < 5
+    use_memmap = false;
+end
 
 alignment_channel = options.channel;
 
@@ -12,8 +15,14 @@ nc_params.h5_filename = sprintf('motion_corrected_ch%d.h5',alignment_channel);
 % Fool NoRMCorre to read data lazily by mimmicking memmap. NoRMCorre
 % assumes the output from memmap is single. 
 mat = ts.get_mat(alignment_channel);
-obj = begonia.processing.motion_correction.DummyMemmap();
-obj.Y = mat;
+
+if use_memmap
+    obj = begonia.processing.motion_correction.DummyMemmap();
+    obj.Y = mat;
+else
+    % read all data into memory:
+    obj = mat(:,:,:);
+end
 mat_out = {};
 
 % Delete the output files from NoRMCorre if they are left over from a 
