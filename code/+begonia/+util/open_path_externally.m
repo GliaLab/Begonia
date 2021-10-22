@@ -1,5 +1,9 @@
 function open_path_externally(path)
 
+    if isfile(path)
+        path = fileparts(path);
+    end
+
     if isunix && ~ismac
         cmd = ['xdg-open "' path '" &'];
         %disp(['Opening external, linux style (fails - cut''n paste to console): ' newline cmd]);
