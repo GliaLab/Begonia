@@ -1,6 +1,9 @@
-function editor = start(dlocs, custom_actions)  
+function editor = start(dlocs, custom_actions, vars)  
     import xylobium.dledit.mods.HasVarMod;
     
+    if nargin < 3
+        vars = dataman.get_default_vars();
+    end
     if nargin < 2
         custom_actions = [];
     end
@@ -10,10 +13,6 @@ function editor = start(dlocs, custom_actions)
 
     actions = dataman.actions.build_menus_and_buttons();
     actions = [custom_actions actions];
-    vars = ["name", "!tags", "path", "type", "source", "stabilized", ...
-        "roi_table", "roi_status", "roa_status", "roa_template", "roa_mask", ...
-        "roi_signals_dff", "roi_signals_rpa", ...
-        "roa_pre_param","roa_pre_finished", "roa_param","roa_finished"];
     
     mods = xylobium.dledit.model.Modifier.empty;
     
