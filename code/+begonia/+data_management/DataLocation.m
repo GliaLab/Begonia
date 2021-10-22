@@ -289,7 +289,11 @@ classdef DataLocation < handle & matlab.mixin.Heterogeneous
         
         % Loads the variable with the provided key from the corresponding
         % file in the metadata directory.  See save_data.
-        function data = load_var(objs, key, default)
+        function data = load_var(objs, key, default, auto_assign)
+            if nargin < 4
+                auto_assign = true;
+            end
+            
             if isstring(key)
                 key = char(key); % FIXME
             end
@@ -308,7 +312,7 @@ classdef DataLocation < handle & matlab.mixin.Heterogeneous
                     val = obj.dl_storage_engine.load_var(obj, key);
                 catch e
                     % If cannot load and we have default argument
-                    if nargin == 3
+                    if nargin >= 3
                         val = default;
                     else
                         rethrow(e);
@@ -325,7 +329,7 @@ classdef DataLocation < handle & matlab.mixin.Heterogeneous
             
             % If no left side assignment, return the variable directly
             % to the callers workspace. 
-            if nargout == 0
+            if nargout == 0 && auto_assign
                 assignin('caller', key, data);
             end
         end
