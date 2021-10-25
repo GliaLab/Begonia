@@ -98,6 +98,18 @@ classdef ViewManager < handle
         function load_tseries(obj, tseries)
             [o_has, o_write, o_read] = obj.data.shorts();
             
+            if isempty(tseries.dt) || isnan(tseries.dt)
+                dt = 1;
+            else
+                dt = tseries.dt;
+            end
+            
+            if isempty(tseries.dx) || isnan(tseries.dx)
+                dx = 1;
+            else
+                dx = tseries.dx;
+            end
+            
             w = waitbar(0, "Opening TSeries-type data");
             
             % Note: see documentation for details on what variables can go
@@ -120,15 +132,15 @@ classdef ViewManager < handle
                 o_write("dunit_to_pix", @(n) n);
             else
                 o_write("dunit","μm")
-                o_write("pix_to_dunit", @(n) n * tseries.dx);
-                o_write("dunit_to_pix", @(n) n / tseries.dx);
+                o_write("pix_to_dunit", @(n) n * dx);
+                o_write("dunit_to_pix", @(n) n / dx);
             end
             
             o_write("z_plane", 1);
             o_write("current_frame", 1);
             o_write("frames", [1:tseries.frame_count]);
-            o_write("frame_time", [1:tseries.frame_count] * tseries.dt);
-            o_write("fps_default", 1 / tseries.dt);
+            o_write("frame_time", [1:tseries.frame_count] * dt);
+            o_write("fps_default", 1 / dt);
             
             % load channels:
             chans = 1:tseries.channels;
@@ -153,7 +165,7 @@ classdef ViewManager < handle
             % initial frame settings:
             obj.name = tseries.name;
             obj.current_frame = 1;
-            obj.frame_times = [1:tseries.frame_count] * tseries.dt;
+            obj.frame_times = [1:tseries.frame_count] * dt;
             obj.frame_count = tseries.frame_count;
             
             delete(w);
