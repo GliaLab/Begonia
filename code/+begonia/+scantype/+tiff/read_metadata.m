@@ -1,6 +1,10 @@
 function metadata = read_metadata(path)
 % Load metadata from the tif file and return a struct. 
 
+if isstring(path)
+    path = char(path);
+end
+
 metadata = struct;
 metadata.name               = [];
 metadata.frame_count        = [];
@@ -172,6 +176,8 @@ switch format
         
         metadata.cycles = 1;
         metadata.source = 'Unknown';
+        metadata.img_dim = size(tif.read());
+        metadata.duration = seconds(metadata.dt * metadata.frame_count);
         
     case 'Sutter'
         str = tif.getTag('ImageDescription');
@@ -234,7 +240,6 @@ switch format
         info = imfinfo(path);
         metadata.frame_count = length(info) / metadata.channels;
         metadata.img_dim = size(tif.read());
-        
         metadata.duration = seconds(metadata.dt * metadata.frame_count);
         
     otherwise
