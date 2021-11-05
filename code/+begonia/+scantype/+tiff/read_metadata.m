@@ -72,7 +72,6 @@ switch format
         metadata.frame_count = SI.hStackManager.framesPerSlice;
         metadata.start_time = datetime(epoch);
         metadata.start_time.Format = 'uuuu/MM/dd HH:mm:ss';
-        metadata.duration = seconds(metadata.frame_count * metadata.dt);
         metadata.source = 'ScanImage';
         
         width_um = SI.hRoiManager.imagingFovUm(3,1) - SI.hRoiManager.imagingFovUm(1,1);
@@ -107,6 +106,7 @@ switch format
             frame_current = frame_low + floor((frame_high - frame_low)/2);
         end
         metadata.frame_count = frame_current;
+        metadata.duration = seconds(metadata.frame_count * metadata.dt);
         
     case 'Begonia'
         % In the "Begonia" format all the metadata is written to the
