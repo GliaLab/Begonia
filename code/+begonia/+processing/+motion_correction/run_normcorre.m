@@ -1,4 +1,8 @@
-function ts_out = run_normcorre(ts, output_path, options, output_format, use_memmap)
+function ts_out = run_normcorre(ts, output_path, options, output_format, use_memmap, lift_to_zero)
+
+if nargin < 6
+    lift_to_zero = true;
+end
 
 if nargin < 5
     use_memmap = false;
@@ -19,9 +23,22 @@ mat = ts.get_mat(alignment_channel);
 if use_memmap
     obj = begonia.processing.motion_correction.DummyMemmap();
     obj.Y = mat;
+    
+    if lift_to_zero
+        warning("cannot lift values to zero as lowest when using memory map");
+    end
 else
     % read all data into memory:
     obj = mat(:,:,:);
+    
+    % normcorre does not like negative values, so we lift to zero if
+    % needed by subtracting the lowest value if less than zero:
+    if lift_to_zero
+        low = min(obj(:));
+        if low < 0
+            obj = obj - low;
+        end
+    end
 end
 mat_out = {};
 
