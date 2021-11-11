@@ -36,6 +36,7 @@ else
     if lift_to_zero
         low = min(obj(:));
         if low < 0
+            warning("your matrix has negative values – all values will be shifted to ensure normocorre operates well on the data");
             obj = obj - low;
         end
     end
