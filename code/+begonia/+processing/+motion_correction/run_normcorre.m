@@ -1,7 +1,7 @@
-function ts_out = run_normcorre(ts, output_path, options, output_format, use_memmap, lift_to_zero)
+function ts_out = run_normcorre(ts, output_path, options, output_format, use_memmap, preproc_funcs)
 
 if nargin < 6
-    lift_to_zero = true;
+    preproc_funcs = function_handle.empty;
 end
 
 if nargin < 5
@@ -23,24 +23,16 @@ mat = ts.get_mat(alignment_channel);
 if use_memmap
     obj = begonia.processing.motion_correction.DummyMemmap();
     obj.Y = mat;
-    
-    if lift_to_zero
-        warning("cannot lift values to zero as lowest when using memory map");
-    end
 else
     % read all data into memory:
     obj = mat(:,:,:);
     
-    % normcorre does not like negative values, so we lift to zero if
-    % needed by subtracting the lowest value if less than zero:
-    if lift_to_zero
-        low = min(obj(:));
-        if low < 0
-            warning("your matrix has negative values – all values will be shifted to ensure normocorre operates well on the data");
-            obj = obj - low;
-        end
+    % pass matrix through processing hooks:
+    for f = begonia.util.to_loopable(preproc_funcs)
+        obj = f{:}(obj);
     end
 end
+       
 mat_out = {};
 
 % Delete the output files from NoRMCorre if they are left over from a 
@@ -54,7 +46,7 @@ end
 
 % Supress warnings when writing single to uint16 in hdf5. 
 warning off
-[mat_out{alignment_channel},shifts,template,nc_params] = normcorre(obj,nc_params);
+[mat_out{alignment_channel} ,shifts, template, nc_params] = normcorre(obj, nc_params);
 warning on
 
 % Align the other channels based on the alignment channel. 
