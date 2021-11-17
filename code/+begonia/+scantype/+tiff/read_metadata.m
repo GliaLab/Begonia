@@ -170,6 +170,8 @@ switch format
             metadata.duration = seconds(metadata.dt * metadata.frame_count);
         end
         
+        metadata.img_dim = size(tif.read());
+        
         metadata.cycles = 1;
         metadata.source = 'Unknown';
         
