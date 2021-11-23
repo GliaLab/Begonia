@@ -6,6 +6,10 @@ end
 assert(mod(merged_frames(1),1) == 0);
 assert(merged_frames(1) > 0);
 
+% Change the file extension to tiff.
+[a,b,~] = fileparts(output_path);
+output_path = fullfile(a,b+".tif");
+
 % Assign metadata that is effected by merging frames. 
 frames = floor(ts.frame_count / merged_frames);
 dt = ts.dt * merged_frames;
@@ -70,12 +74,12 @@ t = Tiff(output_path, 'w8');
 for ch = 1:ts.channels
     mat{ch} = ts.get_mat(ch);
 end
-begonia.logging.backwrite();
+
+tic
 for frame = 1:frames
-    if frame == frames
-        begonia.logging.backwrite(1,'Writing tiff (100%%) > %s',output_path);
-    elseif mod(frame,ceil(frames/100)) == 0
-        begonia.logging.backwrite(1,'Writing tiff (%d%%) > %s',round(frame/frames*100),output_path);
+    if frame == 1 || frame == frames || toc > 10
+        tic
+        begonia.logging.log(1,'Writing tiff (%d%%) > %s',round(frame/frames*100),output_path);
     end
     
     for ch = 1:ts.channels
