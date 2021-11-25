@@ -1,6 +1,8 @@
 function write_h5(ts,mat_cell,output_path)
 
-output_path = [output_path,'.h5'];
+if ~endsWith(output_path, ".h5")
+    output_path = char(output_path + ".h5");
+end
 
 %% Write data
 if exist(output_path,'file')
@@ -10,7 +12,7 @@ dim = [ts.img_dim,ts.channels,ts.frame_count];
 begonia.path.make_dirs(output_path);
 
 % sample data to get the type:
-test_mat = begonia.util.H5Array(mat_cell{1},'dataset_name','/mov');
+test_mat = ts.get_mat(1);
 data_type = class(test_mat(1,1,1));
 mat_out = begonia.util.H5Array(output_path,dim,data_type, ...
     'dataset_name','/recording');
