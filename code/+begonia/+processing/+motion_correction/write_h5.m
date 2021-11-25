@@ -8,7 +8,11 @@ if exist(output_path,'file')
 end
 dim = [ts.img_dim,ts.channels,ts.frame_count];
 begonia.path.make_dirs(output_path);
-mat_out = begonia.util.H5Array(output_path,dim,'uint16', ...
+
+% sample data to get the type:
+test_mat = begonia.util.H5Array(mat_cell{1},'dataset_name','/mov');
+data_type = class(test_mat(1,1,1));
+mat_out = begonia.util.H5Array(output_path,dim,data_type, ...
     'dataset_name','/recording');
 
 begonia.logging.backwrite();
@@ -16,7 +20,7 @@ cnt = 0;
 for ch = 1:ts.channels
     mat = begonia.util.H5Array(mat_cell{ch},'dataset_name','/mov');
     
-    c = begonia.util.Chunker(mat,'data_type',class(mat(1,1,1)));
+    c = begonia.util.Chunker(mat,'data_type',data_type);
     
     for i = 1:c.chunks
         begonia.logging.backwrite(1,'Writing H5 (%d%%) > %s',round(cnt/c.chunks/ts.channels*100),output_path);
