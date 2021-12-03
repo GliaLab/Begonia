@@ -12,7 +12,7 @@ function editor = start(dlocs, custom_actions, vars)
     end
 
     actions = dataman.actions.build_menus_and_buttons();
-    actions = [custom_actions actions];
+    actions = [actions custom_actions];
     
     mods = xylobium.dledit.model.Modifier.empty;
     

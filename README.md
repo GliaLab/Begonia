@@ -10,6 +10,7 @@ The system offers some graphical workflow for non-programmers and an API for pro
 
 Non-programmers can use the framework initially for an overview of data and automatic analysis for project piloting or quick reviews of data as it is collected.
 
+Begonia was last tested on Matlab 2020b.
 
 # Known issues ⚠️
 

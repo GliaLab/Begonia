@@ -1,6 +1,10 @@
 function metadata = read_metadata(path)
 % Load metadata from the tif file and return a struct. 
 
+if isstring(path)
+    path = char(path);
+end
+
 metadata = struct;
 metadata.name               = [];
 metadata.frame_count        = [];
@@ -68,7 +72,6 @@ switch format
         metadata.frame_count = SI.hStackManager.framesPerSlice;
         metadata.start_time = datetime(epoch);
         metadata.start_time.Format = 'uuuu/MM/dd HH:mm:ss';
-        metadata.duration = seconds(metadata.frame_count * metadata.dt);
         metadata.source = 'ScanImage';
         
         width_um = SI.hRoiManager.imagingFovUm(3,1) - SI.hRoiManager.imagingFovUm(1,1);
@@ -103,6 +106,7 @@ switch format
             frame_current = frame_low + floor((frame_high - frame_low)/2);
         end
         metadata.frame_count = frame_current;
+        metadata.duration = seconds(metadata.frame_count * metadata.dt);
         
     case 'Begonia'
         % In the "Begonia" format all the metadata is written to the
@@ -172,6 +176,8 @@ switch format
         
         metadata.cycles = 1;
         metadata.source = 'Unknown';
+        metadata.img_dim = size(tif.read());
+        metadata.duration = seconds(metadata.dt * metadata.frame_count);
         
     case 'Sutter'
         str = tif.getTag('ImageDescription');
@@ -234,7 +240,6 @@ switch format
         info = imfinfo(path);
         metadata.frame_count = length(info) / metadata.channels;
         metadata.img_dim = size(tif.read());
-        
         metadata.duration = seconds(metadata.dt * metadata.frame_count);
         
     otherwise

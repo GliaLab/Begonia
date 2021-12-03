@@ -1,4 +1,8 @@
-function ts_out = run_normcorre(ts, output_path, options, output_format, use_memmap)
+function ts_out = run_normcorre(ts, output_path, options, output_format, use_memmap, preproc_funcs)
+
+if nargin < 6
+    preproc_funcs = function_handle.empty;
+end
 
 if nargin < 5
     use_memmap = false;
@@ -22,7 +26,13 @@ if use_memmap
 else
     % read all data into memory:
     obj = mat(:,:,:);
+    
+    % pass matrix through processing hooks:
+    for f = begonia.util.to_loopable(preproc_funcs)
+        obj = f{:}(obj);
+    end
 end
+       
 mat_out = {};
 
 % Delete the output files from NoRMCorre if they are left over from a 
@@ -36,7 +46,7 @@ end
 
 % Supress warnings when writing single to uint16 in hdf5. 
 warning off
-[mat_out{alignment_channel},shifts,template,nc_params] = normcorre(obj,nc_params);
+[mat_out{alignment_channel} ,shifts, template, nc_params] = normcorre(obj, nc_params);
 warning on
 
 % Align the other channels based on the alignment channel. 

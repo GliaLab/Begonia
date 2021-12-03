@@ -41,6 +41,10 @@ classdef DataLocation < handle & matlab.mixin.Heterogeneous
                 skip_pathcheck = false;
             end
             
+            if isstring(path)
+                path = char(path);
+            end
+            
             if ~skip_pathcheck && ~exist(path, 'file')
                 error(['DataLocation: requested path does not exist: ' path]);
             end
