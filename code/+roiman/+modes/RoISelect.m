@@ -2,7 +2,7 @@ classdef RoISelect < roiman.Mode
     
     properties
         HELP_MSG = "Select rois by clicking/dragging";
-        GUIDE_TEXT = "*ROI-SELECT*\n\nClick: select RoI\nShift click: add to selection\nDrag: Select area\ns : split selected by component\np : set parent to first selected\nshift-p : clear parents\ncrtl-a: Select all rois\n(Shift+)-arrowkeys: move rois\n\n REMEMBER: Save changes before closing";
+        GUIDE_TEXT = "*ROI-SELECT*\n\nClick: select RoI\nShift click: add to selection\nDrag: Select area\ns : split selected by component\np : set parent to first selected\nshift-p : clear parents\ncrtl-a: Select all rois\n(Shift)-arrowkeys: move rois\n\n REMEMBER: Save changes before closing";
         
         drag_state
         drag_points
@@ -77,7 +77,7 @@ classdef RoISelect < roiman.Mode
                     else
                         npx = 1;
                     end
-                    rois = roiman.modes.RoISelect.move_splines(manager,'XData',npx);
+                    rois = roiman.modes.RoISelect.move_splines(manager,'YData',npx);
                     roiman.modes.RoISelect.update_mask(manager,rois,0,npx);
                 end
                 
