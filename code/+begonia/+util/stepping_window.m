@@ -11,7 +11,7 @@ if nargin < 4 || isempty(start_stop)
 end
 
 if nargin < 5
-    data_class = class(mat);
+    data_class = class(mat(1,1,1));
 end
 
 idx_start = start_stop(1);

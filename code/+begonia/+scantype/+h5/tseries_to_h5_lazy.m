@@ -33,8 +33,6 @@ for ch = 1:ts.channels
     begonia.logging.log(1,'Writing ch %d (%d frames)', ch, merged_frames * frames);
     mat = ts.get_mat(ch);
     
-    mat = mat(:,:,:);
-    
     mat = begonia.util.stepping_window(mat,10);
 
     mat_out(:,:,ch,:) = mat;
