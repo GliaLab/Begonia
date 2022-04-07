@@ -8,6 +8,10 @@ if nargin < 5
     use_memmap = false;
 end
 
+if isstring(output_path)
+    output_path = char(output_path);
+end
+
 alignment_channel = options.channel;
 
 nc_params = options.nc_params;
