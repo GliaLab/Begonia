@@ -1,4 +1,4 @@
-function tseries_to_h5(ts,output_path,merged_frames)
+function tseries_to_h5_lazy(ts,output_path,merged_frames)
 if nargin < 3
     merged_frames = 1;
 end
@@ -33,7 +33,7 @@ for ch = 1:ts.channels
     begonia.logging.log(1,'Writing ch %d (%d frames)', ch, merged_frames * frames);
     mat = ts.get_mat(ch);
     
-    mat = begonia.util.stepping_window(mat,10);
+    mat = begonia.util.stepping_window(mat,merged_frames);
 
     mat_out(:,:,ch,:) = mat;
 end

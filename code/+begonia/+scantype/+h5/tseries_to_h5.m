@@ -35,7 +35,7 @@ for ch = 1:ts.channels
     
     mat = mat(:,:,:);
     
-    mat = begonia.util.stepping_window(mat,10);
+    mat = begonia.util.stepping_window(mat,merged_frames);
 
     mat_out(:,:,ch,:) = mat;
 end
