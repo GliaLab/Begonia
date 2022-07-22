@@ -1,6 +1,7 @@
 classdef H5Array
     % Example
-%     mat = begonia.util.H5Array('test.h5',[3,3,3],'single','dataset_name','/asdf');
+%     mat = begonia.util.H5Array('test.h5',[3,3,3]);
+%     mat = begonia.util.H5Array('test.h5',[3,3,3],'double','dataset_name','/asdf');
 %     mat = begonia.util.H5Array('test.h5',[5,5,2],'single','dataset_name','/a/b');
 %     mat = begonia.util.H5Array('test.h5',[3,2,3],'single','dataset_name','/a/a');
 %     mat = begonia.util.H5Array('test.h5','dataset_name','/a/b');
@@ -162,7 +163,11 @@ classdef H5Array
                             count(i) = length(I);
                         end
                     end
-                    data = reshape(data,count);
+                    
+                    % Reshape the data to fit h5write.
+                    if length(count) > 1
+                        data = reshape(data,count);
+                    end
                     
                     warning off
                     h5write(self.filename,self.dataset_name,data,start,count,stride)
